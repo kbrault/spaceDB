@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Saturn V",
+    "manufacturer": "NASA",
+    "first_flight": 1967
+  },
+  {
+    "name": "Falcon 9",
+    "manufacturer": "SpaceX",
+    "first_flight": 2010
+  },
+  {
+    "name": "Ariane 5",
+    "manufacturer": "Arianespace",
+    "first_flight": 1996
+  }
+]

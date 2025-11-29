@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "manufacturer": { "type": "string" },
+      "first_flight": { "type": "integer" }
+    },
+    "required": ["name", "manufacturer", "first_flight"],
+    "additionalProperties": false
+  }
+}
