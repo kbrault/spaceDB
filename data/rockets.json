@@ -1,32 +1,81 @@
 [
-  { "name": "Saturn V", "slug": "saturn-v", "manufacturer": "NASA", "first_flight": 1967 },
-  { "name": "Falcon 9", "slug": "falcon-9", "manufacturer": "SpaceX", "first_flight": 2010 },
-  { "name": "Ariane 5", "slug": "ariane-5", "manufacturer": "Arianespace", "first_flight": 1996 },
-  { "name": "Ariane 6", "slug": "ariane-6", "manufacturer": "Arianespace", "first_flight": 2024 },
-  { "name": "Soyuz", "slug": "soyuz", "manufacturer": "Roskosmos", "first_flight": 1966 },
-  { "name": "Atlas V", "slug": "atlas-v", "manufacturer": "ULA", "first_flight": 2002 },
-  { "name": "Delta IV Heavy", "slug": "delta-iv-heavy", "manufacturer": "ULA", "first_flight": 2004 },
-  { "name": "Long March 2F", "slug": "long-march-2f", "manufacturer": "CNSA", "first_flight": 1999 },
-  { "name": "Long March 3B", "slug": "long-march-3b", "manufacturer": "CNSA", "first_flight": 1996 },
-  { "name": "Long March 5", "slug": "long-march-5", "manufacturer": "CNSA", "first_flight": 2016 },
-  { "name": "H-IIA", "slug": "h-iia", "manufacturer": "JAXA", "first_flight": 2001 },
-  { "name": "H3", "slug": "h3", "manufacturer": "JAXA", "first_flight": 2023 },
-  { "name": "Electron", "slug": "electron", "manufacturer": "Rocket Lab", "first_flight": 2017 },
-  { "name": "New Shepard", "slug": "new-shepard", "manufacturer": "Blue Origin", "first_flight": 2015 },
-  { "name": "Vega", "slug": "vega", "manufacturer": "Arianespace", "first_flight": 2012 },
-  { "name": "Vega-C", "slug": "vega-c", "manufacturer": "Arianespace", "first_flight": 2022 },
-  { "name": "PSLV", "slug": "pslv", "manufacturer": "ISRO", "first_flight": 1993 },
-  { "name": "GSLV Mk II", "slug": "gslv-mk-ii", "manufacturer": "ISRO", "first_flight": 2010 },
-  { "name": "SLS", "slug": "sls", "manufacturer": "NASA", "first_flight": 2022 },
-  { "name": "Starship", "slug": "starship", "manufacturer": "SpaceX", "first_flight": 2023 },
-  { "name": "Proton-M", "slug": "proton-m", "manufacturer": "Roskosmos", "first_flight": 2001 },
-  { "name": "Angara A5", "slug": "angara-a5", "manufacturer": "Roskosmos", "first_flight": 2014 },
-  { "name": "Titan II", "slug": "titan-ii", "manufacturer": "United States Air Force", "first_flight": 1962 },
-  { "name": "Titan IV", "slug": "titan-iv", "manufacturer": "United States Air Force", "first_flight": 1989 },
-  { "name": "Delta II", "slug": "delta-ii", "manufacturer": "Boeing", "first_flight": 1989 },
-  { "name": "Epsilon", "slug": "epsilon", "manufacturer": "JAXA", "first_flight": 2013 },
-  { "name": "SSLV", "slug": "sslv", "manufacturer": "ISRO", "first_flight": 2022 },
-  { "name": "Soyuz-2.1b", "slug": "soyuz-2-1b", "manufacturer": "Roskosmos", "first_flight": 2006 },
-  { "name": "Falcon Heavy", "slug": "falcon-heavy", "manufacturer": "SpaceX", "first_flight": 2018 },
-  { "name": "Ariane 4", "slug": "ariane-4", "manufacturer": "Arianespace", "first_flight": 1988 }
+  {
+    "name": "Saturn V",
+    "slug": "saturn-v",
+    "agency": "NASA",
+    "first_flight": 1967,
+    "variants": []
+  },
+  {
+    "name": "Falcon 9",
+    "slug": "falcon-9",
+    "agency": "SpaceX",
+    "first_flight": 2010,
+    "variants": [
+      {
+        "name": "Falcon Heavy",
+        "slug": "falcon-heavy",
+        "first_flight": 2018
+      }
+    ]
+  },
+  {
+    "name": "Ariane",
+    "slug": "ariane",
+    "agency": "Arianespace",
+    "first_flight": 1988,
+    "variants": [
+      {
+        "name": "Ariane 4",
+        "slug": "ariane-4",
+        "first_flight": 1988
+      },
+      {
+        "name": "Ariane 5",
+        "slug": "ariane-5",
+        "first_flight": 1996
+      },
+      {
+        "name": "Ariane 6",
+        "slug": "ariane-6",
+        "first_flight": 2024
+      }
+    ]
+  },
+  {
+    "name": "Soyuz",
+    "slug": "soyuz",
+    "agency": "Roskosmos",
+    "first_flight": 1966,
+    "variants": [
+      {
+        "name": "Soyuz-2.1b",
+        "slug": "soyuz-2-1b",
+        "first_flight": 2006
+      }
+    ]
+  },
+  {
+    "name": "Long March",
+    "slug": "long-march",
+    "agency": "CNSA",
+    "first_flight": 1996,
+    "variants": [
+      {
+        "name": "Long March 2F",
+        "slug": "long-march-2f",
+        "first_flight": 1999
+      },
+      {
+        "name": "Long March 3B",
+        "slug": "long-march-3b",
+        "first_flight": 1996
+      },
+      {
+        "name": "Long March 5",
+        "slug": "long-march-5",
+        "first_flight": 2016
+      }
+    ]
+  }
 ]

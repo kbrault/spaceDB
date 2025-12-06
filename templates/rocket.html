@@ -1,16 +1,82 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="{{ base_url }}/rockets.html" class="btn btn-secondary mb-3">Back to Rockets</a>
 
-<div class="card">
-    <div class="card-body">
-        <h2 class="card-title">{{ rocket.name }}</h2>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Manufacturer:</strong> {{ rocket.manufacturer }}</li>
-            <li class="list-group-item"><strong>First Flight:</strong> {{ rocket.first_flight }}</li>
-        </ul>
+<div class="card mb-3 p-3">
+    <div class="row g-3 align-items-start">
+        <div class="col-12 col-md-4">
+            {% if rocket.image_url %}
+                <img src="{{ rocket.image_url }}" class="img-fluid rounded" alt="{{ rocket.name }}">
+            {% else %}
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center" 
+                     style="width:100%; height:400px; border-radius:0.25rem;">
+                    No Image
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-12 col-md-8">
+            <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><strong>Agency:</strong> {{ rocket.agency }}</li>
+                <li class="list-group-item"><strong>First Flight:</strong> {{ rocket.first_flight }}</li>
+            </ul>
+
+            {% if rocket.variants %}
+            <div class="row g-3">
+                {% for variant in rocket.variants %}
+                <div class="col-12 col-lg-6 mb-3">
+                    <div class="card p-2">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ variant.name }}</h5>
+                            <ul class="list-group list-group-flush">
+                                {% if variant.agency %}
+                                <li class="list-group-item"><strong>Agency:</strong> {{ variant.agency }}</li>
+                                {% endif %}
+                                <li class="list-group-item"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<div class="card mb-3 p-3">
+    <h3 class="card-title mb-3">Launches</h3>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <span class="me-3">2021-03-04</span>
+                <strong>Starlink 17</strong><br>
+                <small>Variant: Falcon 9 Block 5</small>
+            </div>
+            <span class="badge bg-success text-white py-2 px-2">Success</span>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <span class="me-3">2021-01-24</span>
+                <strong>Transporter-1</strong><br>
+                <small>Variant: Falcon 9 Block 5</small>
+            </div>
+            <span class="badge bg-success text-white py-2 px-2">Success</span>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <span class="me-3">2022-11-16</span>
+                <strong>Artemis I</strong><br>
+                <small>Variant: SLS Block 1</small>
+            </div>
+            <span class="badge bg-danger text-white py-2 px-2">Failure</span>
+        </li>
+    </ul>
+</div>
+
+
+
+
 
 {% endblock %}

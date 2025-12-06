@@ -22,7 +22,7 @@ ITEMS_PER_PAGE = 10
 BASE_URL = "http://127.0.0.1:5500/output_site"  
 
 # Meta defaults
-INDEX_TITLE = "Home – RocketDB"
+INDEX_TITLE = "Home"
 INDEX_DESCRIPTION = "RocketDB home page listing rocket pages"
 INDEX_CANONICAL = f"{BASE_URL}/index.html"
 
@@ -30,8 +30,8 @@ ROCKETS_TITLE_PATTERN = "Rockets – Page {page_num}"
 ROCKETS_DESCRIPTION_PATTERN = "RocketDB listing rockets – page {page_num}"
 ROCKETS_CANONICAL_PATTERN = "rockets{page_suffix}.html"
 
-ROCKET_TITLE_PATTERN = "{rocket_name} ({manufacturer})"
-ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Manufacturer: {manufacturer}, First Flight: {first_flight}"
+ROCKET_TITLE_PATTERN = "{rocket_name} ({agency})"
+ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Agency: {agency}, First Flight: {first_flight}"
 ROCKET_CANONICAL_PATTERN = "rocket/{slug}.html"
 
 # -----------------------------
@@ -104,11 +104,11 @@ def generate_rocket_pages(env, rockets):
             env, template_name, rocket_path,
             title=ROCKET_TITLE_PATTERN.format(
                 rocket_name=rocket["name"],
-                manufacturer=rocket["manufacturer"]
+                agency=rocket["agency"]
             ),
             description=ROCKET_DESCRIPTION_PATTERN.format(
                 rocket_name=rocket["name"],
-                manufacturer=rocket["manufacturer"],
+                agency=rocket["agency"],
                 first_flight=rocket["first_flight"]
             ),
             canonical=canonical_url,

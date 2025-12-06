@@ -6,10 +6,23 @@
     "properties": {
       "name": { "type": "string" },
       "slug": { "type": "string" },
-      "manufacturer": { "type": "string" },
-      "first_flight": { "type": "integer" }
+      "agency": { "type": "string" },
+      "first_flight": { "type": "integer" },
+      "variants": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "slug": { "type": "string" },
+            "first_flight": { "type": "integer" }
+          },
+          "required": ["name", "slug", "first_flight"],
+          "additionalProperties": false
+        }
+      }
     },
-    "required": ["name", "slug", "manufacturer", "first_flight"],
+    "required": ["name", "slug", "agency", "first_flight"],
     "additionalProperties": false
   }
 }

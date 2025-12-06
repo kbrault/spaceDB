@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>{{ title }}</title>
@@ -14,21 +15,33 @@
 
     <link rel="stylesheet" href="{{ base_url }}/assets/styles.css">
 </head>
-<body>
-    <header class="bg-light py-3 mb-4">
-        <div class="container">
-            <h1 class="mb-0">{{ title }}</h1>
-        </div>
-    </header>
 
-    <main class="container mb-5">
+<body>
+<header class="bg-light">
+    <div class="w-100 bg-dark text-white py-3">
+        <div class="container">
+            <h1 class="m-0 py-3">
+                <a href="{{ base_url }}/" class="text-white text-decoration-none">rocketDB</a>
+            </h1>
+        </div>
+    </div>
+    <div class="container mt-3">
+        <h2 class="pb-3">{{ title }}</h2>
+    </div>
+</header>
+
+
+
+
+    <main class="container mb-5 mt-3">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="bg-light py-3">
         <div class="container">
-            <p class="mb-0">RocketDB 0.1, last update: {{ date }}</p>
+            <p class="mb-0">RocketDB 0.1 - Last update: {{ date }}</p>
         </div>
     </footer>
 </body>
+
 </html>

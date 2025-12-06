@@ -3,5 +3,10 @@
     "title": "Rockets",
     "summary": "List of rockets",
     "url": "rockets.html"
+  },
+  {
+    "title": "Launches",
+    "summary": "List of launches",
+    "url": "launches.html"
   }
 ]
