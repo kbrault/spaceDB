@@ -5,10 +5,11 @@
     "type": "object",
     "properties": {
       "name": { "type": "string" },
+      "slug": { "type": "string" },
       "manufacturer": { "type": "string" },
       "first_flight": { "type": "integer" }
     },
-    "required": ["name", "manufacturer", "first_flight"],
+    "required": ["name", "slug", "manufacturer", "first_flight"],
     "additionalProperties": false
   }
 }

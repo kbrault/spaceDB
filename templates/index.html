@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<ul>
+<div class="list-group">
     {% for page in pages %}
-    <li><a href="{{ page.url }}">{{ page.title }}</a> - {{ page.summary }}</li>
+    <a href="{{ base_url }}/{{ page.url }}" class="list-group-item list-group-item-action">
+        {{ page.title }}
+    </a>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}
