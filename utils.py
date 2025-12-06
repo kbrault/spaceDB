@@ -14,7 +14,11 @@ def remove_and_recreate_dir(path):
                 os.remove(entry_path)
             elif os.path.isdir(entry_path):
                 remove_and_recreate_dir(entry_path)
-        os.rmdir(path)
+                os.rmdir(entry_path)
+        try:
+            os.rmdir(path)
+        except OSError:
+            pass
     os.makedirs(path, exist_ok=True)
 
 def validate_json(data, schema):
