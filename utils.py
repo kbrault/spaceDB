@@ -26,3 +26,30 @@ def validate_json(data, schema):
         validate(instance=data, schema=schema)
     except ValidationError as e:
         raise ValueError(f"JSON validation failed: {e}")
+
+def get_pagination_range(current_page, total_pages, delta=3):
+    """
+    Returns a list of pages to display in pagination with ellipses.
+    delta: number of pages before and after the current page
+    """
+    range_pages = []
+
+    if current_page - delta > 2:
+        range_pages.append(1)
+        range_pages.append('...')
+        start = current_page - delta
+    else:
+        start = 1
+
+    if current_page + delta < total_pages - 1:
+        end = current_page + delta
+    else:
+        end = total_pages
+
+    range_pages.extend(range(start, end + 1))
+
+    if end < total_pages:
+        range_pages.append('...')
+        range_pages.append(total_pages)
+
+    return range_pages

@@ -2,6 +2,8 @@
 
 {% block content %}
 <a href="index.html">Back</a>
+<p>Last update: {{ date }}</p>
+
 <table>
     <thead>
         <tr>
@@ -20,5 +22,20 @@
         {% endfor %}
     </tbody>
 </table>
-</ul>
+
+<div class="pagination">
+    {% for page in pagination %}
+        {% if page == '...' %}
+            <span class="dots">…</span>
+        {% elif page == current_page %}
+            <span class="current">{{ page }}</span>
+        {% else %}
+            {% if page == 1 %}
+                <a href="rockets.html">{{ page }}</a>
+            {% else %}
+                <a href="rockets_page_{{ page }}.html">{{ page }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
 {% endblock %}

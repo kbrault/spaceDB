@@ -1,52 +1,93 @@
-import os
+import datetime
+import math
+from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
-from utils import load_json, remove_and_recreate_dir, validate_json
+from utils import load_json, remove_and_recreate_dir, validate_json, get_pagination_range
 
-# Paths of files and dir
-pages_file = "data/pages.json"
-rockets_file = "data/rockets.json"
-rockets_schema_file = "models/rockets.schema.json"
-output_dir = "output_site"
-template_dir = "templates"
-assets_dir = "assets"
+# -----------------------------
+# Configuration
+# -----------------------------
+PAGES_FILE = Path("data/pages.json")
+ROCKETS_FILE = Path("data/rockets.json")
+ROCKETS_SCHEMA_FILE = Path("models/rockets.schema.json")
+OUTPUT_DIR = Path("output_site")
+TEMPLATE_DIR = Path("templates")
+ASSETS_DIR = Path("assets")
+ITEMS_PER_PAGE = 10
 
-# Load rockets and validate data
-rockets = load_json(rockets_file)
-rockets_schema = load_json(rockets_schema_file)
-validate_json(rockets, rockets_schema)
+# -----------------------------
+# Helper Functions
+# -----------------------------
+def copy_assets(src_dir: Path, dest_dir: Path):
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for file_path in src_dir.iterdir():
+        if file_path.is_file():
+            dest_file = dest_dir / file_path.name
+            dest_file.write_bytes(file_path.read_bytes())
 
-# Load pages
-pages = load_json(pages_file)
+def render_template(template_env, template_name, output_path, **context):
+    template = template_env.get_template(template_name)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(template.render(**context), encoding="utf-8")
 
-# Prepare output directory
-remove_and_recreate_dir(output_dir)
+def generate_index(env, pages, output_dir):
+    render_template(
+        env, "index.html", output_dir / "index.html",
+        title="Home",
+        pages=pages,
+        date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
 
-# Copy flat assets
-output_assets_dir = os.path.join(output_dir, "assets")
-os.makedirs(output_assets_dir, exist_ok=True)
+def generate_rockets_pages(env, rockets, output_dir, items_per_page=10):
+    total_rockets = len(rockets)
+    total_pages = math.ceil(total_rockets / items_per_page)
+    template_name = "rockets.html"
 
-for filename in os.listdir(assets_dir):
-    src_path = os.path.join(assets_dir, filename)
-    dest_path = os.path.join(output_assets_dir, filename)
-    if os.path.isfile(src_path):
-        with open(src_path, "rb") as src_file:
-            content = src_file.read()
-        with open(dest_path, "wb") as dest_file:
-            dest_file.write(content)
+    for page_num in range(1, total_pages + 1):
+        start = (page_num - 1) * items_per_page
+        end = start + items_per_page
+        rockets_page = rockets[start:end]
+        pagination = get_pagination_range(page_num, total_pages, delta=3)
 
-# Setup Jinja2
-env = Environment(loader=FileSystemLoader(template_dir))
+        if page_num == 1:
+            rockets_path = output_dir / "rockets.html"
+        else:
+            rockets_path = output_dir / f"rockets_page_{page_num}.html"
 
-# Generate pages
-## Index
-index_template = env.get_template("index.html")
-index_path = os.path.join(output_dir, "index.html")
-with open(index_path, "w", encoding="utf-8") as f:
-    f.write(index_template.render(title="Home", pages=pages))
+        render_template(
+            env, template_name, rockets_path,
+            title="Rockets",
+            rockets=rockets_page,
+            date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            current_page=page_num,
+            total_pages=total_pages,
+            pagination=pagination
+        )
 
-index_template = env.get_template("rockets.html")
-index_path = os.path.join(output_dir, "rockets.html")
-with open(index_path, "w", encoding="utf-8") as f:
-    f.write(index_template.render(title="Rockets", rockets=rockets))
+# -----------------------------
+# Main Script
+# -----------------------------
+def main():
+    # Load data
+    rockets = load_json(ROCKETS_FILE)
+    rockets_schema = load_json(ROCKETS_SCHEMA_FILE)
+    validate_json(rockets, rockets_schema)
+    pages = load_json(PAGES_FILE)
 
-print(f"Site generated in '{output_dir}' folder.")
+    # Prepare output directory
+    remove_and_recreate_dir(OUTPUT_DIR)
+
+    # Copy assets
+    copy_assets(ASSETS_DIR, OUTPUT_DIR / "assets")
+
+    # Setup Jinja2
+    env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
+
+    # Generate pages
+    generate_index(env, pages, OUTPUT_DIR)
+    generate_rockets_pages(env, rockets, OUTPUT_DIR, ITEMS_PER_PAGE)
+
+    print(f"Site generated in '{OUTPUT_DIR}' folder.")
+
+if __name__ == "__main__":
+    main()

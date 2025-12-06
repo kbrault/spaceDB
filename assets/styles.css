@@ -1,6 +1,25 @@
-  table {
-    border-collapse: collapse;
-  }
-  table, th, td {
-    border: 1px solid black;
-  }
+.pagination {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.pagination a {
+    padding: 0.3rem 0.6rem;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+}
+
+.pagination .current {
+    font-weight: bold;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #eee;
+}
+
+.pagination .dots {
+    padding: 0.3rem 0.6rem;
+}
