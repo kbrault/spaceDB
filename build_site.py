@@ -19,7 +19,7 @@ ASSETS_DIR = Path("assets")
 ITEMS_PER_PAGE = 10
 
 # Base URL for canonical links and assets
-BASE_URL = "http://127.0.0.1:5500/output_site/"  
+BASE_URL = "http://127.0.0.1:5500/output_site"  
 
 # Meta defaults
 INDEX_TITLE = "Home – RocketDB"
@@ -126,6 +126,9 @@ def main():
     rockets_schema = load_json(ROCKETS_SCHEMA_FILE)
     validate_json(rockets, rockets_schema)
     pages = load_json(PAGES_FILE)
+    
+    # Sort rockets
+    rockets = sorted(rockets, key=lambda r: r["first_flight"])
 
     # Prepare output directory
     remove_and_recreate_dir(OUTPUT_DIR)

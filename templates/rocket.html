@@ -6,8 +6,11 @@
 <div class="card">
     <div class="card-body">
         <h2 class="card-title">{{ rocket.name }}</h2>
-        <p class="card-text"><strong>Manufacturer:</strong> {{ rocket.manufacturer }}</p>
-        <p class="card-text"><strong>First Flight:</strong> {{ rocket.first_flight }}</p>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Manufacturer:</strong> {{ rocket.manufacturer }}</li>
+            <li class="list-group-item"><strong>First Flight:</strong> {{ rocket.first_flight }}</li>
+        </ul>
     </div>
 </div>
+
 {% endblock %}
