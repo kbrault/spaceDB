@@ -5,23 +5,5 @@
     {% for page in pages %}
     <li><a href="{{ page.url }}">{{ page.title }}</a> - {{ page.summary }}</li>
     {% endfor %}
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Manufacturer</th>
-                <th>First Flight</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rocket in rockets %}
-            <tr>
-                <td>{{ rocket.name }}</td>
-                <td>{{ rocket.manufacturer }}</td>
-                <td>{{ rocket.first_flight }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </ul>
 {% endblock %}

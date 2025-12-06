@@ -1,12 +1,7 @@
 [
   {
-    "title": "Introduction",
-    "summary": "General overview of the project.",
-    "url": "introduction.html"
-  },
-  {
-    "title": "Methodology",
-    "summary": "Description of the analytical framework.",
-    "url": "methodology.html"
+    "title": "Rockets",
+    "summary": "List of rockets",
+    "url": "rockets.html"
   }
 ]

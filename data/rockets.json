@@ -1,17 +1,32 @@
 [
-  {
-    "name": "Saturn V",
-    "manufacturer": "NASA",
-    "first_flight": 1967
-  },
-  {
-    "name": "Falcon 9",
-    "manufacturer": "SpaceX",
-    "first_flight": 2010
-  },
-  {
-    "name": "Ariane 5",
-    "manufacturer": "Arianespace",
-    "first_flight": 1996
-  }
+  { "name": "Saturn V", "manufacturer": "NASA", "first_flight": 1967 },
+  { "name": "Falcon 9", "manufacturer": "SpaceX", "first_flight": 2010 },
+  { "name": "Ariane 5", "manufacturer": "Arianespace", "first_flight": 1996 },
+  { "name": "Ariane 6", "manufacturer": "Arianespace", "first_flight": 2024 },
+  { "name": "Soyuz", "manufacturer": "Roskosmos", "first_flight": 1966 },
+  { "name": "Atlas V", "manufacturer": "ULA", "first_flight": 2002 },
+  { "name": "Delta IV Heavy", "manufacturer": "ULA", "first_flight": 2004 },
+  { "name": "Long March 2F", "manufacturer": "CNSA", "first_flight": 1999 },
+  { "name": "Long March 3B", "manufacturer": "CNSA", "first_flight": 1996 },
+  { "name": "Long March 5", "manufacturer": "CNSA", "first_flight": 2016 },
+  { "name": "H-IIA", "manufacturer": "JAXA", "first_flight": 2001 },
+  { "name": "H3", "manufacturer": "JAXA", "first_flight": 2023 },
+  { "name": "Electron", "manufacturer": "Rocket Lab", "first_flight": 2017 },
+  { "name": "New Shepard", "manufacturer": "Blue Origin", "first_flight": 2015 },
+  { "name": "Vega", "manufacturer": "Arianespace", "first_flight": 2012 },
+  { "name": "Vega-C", "manufacturer": "Arianespace", "first_flight": 2022 },
+  { "name": "PSLV", "manufacturer": "ISRO", "first_flight": 1993 },
+  { "name": "GSLV Mk II", "manufacturer": "ISRO", "first_flight": 2010 },
+  { "name": "SLS", "manufacturer": "NASA", "first_flight": 2022 },
+  { "name": "Starship", "manufacturer": "SpaceX", "first_flight": 2023 },
+  { "name": "Proton-M", "manufacturer": "Roskosmos", "first_flight": 2001 },
+  { "name": "Angara A5", "manufacturer": "Roskosmos", "first_flight": 2014 },
+  { "name": "Titan II", "manufacturer": "United States Air Force", "first_flight": 1962 },
+  { "name": "Titan IV", "manufacturer": "United States Air Force", "first_flight": 1989 },
+  { "name": "Delta II", "manufacturer": "Boeing", "first_flight": 1989 },
+  { "name": "Epsilon", "manufacturer": "JAXA", "first_flight": 2013 },
+  { "name": "SSLV", "manufacturer": "ISRO", "first_flight": 2022 },
+  { "name": "Soyuz-2.1b", "manufacturer": "Roskosmos", "first_flight": 2006 },
+  { "name": "Falcon Heavy", "manufacturer": "SpaceX", "first_flight": 2018 },
+  { "name": "Ariane 4", "manufacturer": "Arianespace", "first_flight": 1988 }
 ]
