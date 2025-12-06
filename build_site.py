@@ -1,5 +1,4 @@
-import datetime
-import math
+import datetime, time, math
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from utils import load_json, remove_and_recreate_dir, validate_json, get_pagination_range
@@ -91,7 +90,53 @@ def generate_rockets_pages(env, rockets):
             base_url=BASE_URL
         )
 
-def generate_rocket_pages(env, rockets):
+def generate_rocket_and_variant_pages(env, rockets):
+    template_rocket = "rocket.html"
+    template_variant = "variant.html"
+
+    rocket_dir = OUTPUT_DIR / "rocket"
+    rocket_dir.mkdir(parents=True, exist_ok=True)
+
+    for rocket in rockets:
+        # Rocket page
+        rocket_path = rocket_dir / f"{rocket['slug']}.html"
+        canonical_url = f"{BASE_URL}/rocket/{rocket['slug']}.html"
+        render_template(
+            env, template_rocket, rocket_path,
+            title=ROCKET_TITLE_PATTERN.format(
+                rocket_name=rocket["name"],
+                agency=rocket["agency"]
+            ),
+            description=ROCKET_DESCRIPTION_PATTERN.format(
+                rocket_name=rocket["name"],
+                agency=rocket["agency"],
+                first_flight=rocket["first_flight"]
+            ),
+            canonical=canonical_url,
+            rocket=rocket,
+            date=datetime.datetime.now().strftime("%Y-%m-%d"),
+            base_url=BASE_URL,
+            show_title=True
+        )
+
+        variant_dir = rocket_dir / rocket['slug']
+        variant_dir.mkdir(parents=True, exist_ok=True)
+
+        for variant in rocket.get("variants", []):
+            variant_path = variant_dir / f"{variant['slug']}.html"
+            canonical_url = f"{BASE_URL}/rocket/{rocket['slug']}/{variant['slug']}.html"
+            render_template(
+                env, template_variant, variant_path,
+                title=f"{variant['name']} ({rocket['agency']})",
+                description=f"{variant['name']} – First Flight: {variant['first_flight']}",
+                canonical=canonical_url,
+                variant=variant,
+                rocket=rocket,
+                date=datetime.datetime.now().strftime("%Y-%m-%d"),
+                base_url=BASE_URL,
+                show_title=True
+            )
+
     template_name = "rocket.html"
     rocket_dir = OUTPUT_DIR / "rocket"
     rocket_dir.mkdir(parents=True, exist_ok=True)
@@ -114,13 +159,16 @@ def generate_rocket_pages(env, rockets):
             canonical=canonical_url,
             rocket=rocket,
             date=datetime.datetime.now().strftime("%Y-%m-%d"),
-            base_url=BASE_URL
+            base_url=BASE_URL,
+            show_title=True 
         )
 
 # -----------------------------
 # Main Script
 # -----------------------------
 def main():
+    start_time = time.time()
+
     # Load data
     rockets = load_json(ROCKETS_FILE)
     rockets_schema = load_json(ROCKETS_SCHEMA_FILE)
@@ -140,12 +188,29 @@ def main():
     env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
     env.globals["base_url"] = BASE_URL 
 
+    # Track number of pages
+    total_pages_created = 0
+
     # Generate pages
     generate_index(env, pages)
+    total_pages_created += 1
+
     generate_rockets_pages(env, rockets)
-    generate_rocket_pages(env, rockets)
+    
+    # Calculate number of rockets pages
+    total_pages_created += math.ceil(len(rockets) / ITEMS_PER_PAGE)
+
+    generate_rocket_and_variant_pages(env, rockets)
+    # Count rocket pages + variant pages
+    total_pages_created += len(rockets)  # Rocket pages
+    total_pages_created += sum(len(r.get("variants", [])) for r in rockets)  # Variant pages
+
+    elapsed_time = time.time() - start_time  # End timing
 
     print(f"Site generated in '{OUTPUT_DIR}' folder.")
+    print(f"Total pages created: {total_pages_created}")
+    print(f"Time elapsed: {elapsed_time:.2f} seconds")
+
 
 if __name__ == "__main__":
     main()

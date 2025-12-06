@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-light rounded p-3 mb-1">
+        <li class="breadcrumb-item"><a href="{{ base_url }}/">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ base_url }}/rockets.html">Rockets</a></li>
+        <li class="breadcrumb-item"><a href="{{ base_url }}/rocket/{{ rocket.slug }}.html">{{ rocket.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ variant.name }}</li>
+    </ol>
+</nav>
+
+<div class="card mb-3 p-3">
+    <div class="row g-3 align-items-start">
+        <div class="col-12 col-md-4">
+            <figure class="figure w-100">
+                {% if rocket.image_url %}
+                <img src="{{ rocket.image_url }}" class="figure-img img-fluid rounded" alt="{{ rocket.name }}">
+                {% else %}
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center figure-img w-100"
+                    style="height:400px; border-radius:0.25rem;">
+                    No Image
+                </div>
+                {% endif %}
+                <figcaption class="figure-caption text-center mt-2">{{ rocket.name }}</figcaption>
+            </figure>
+        </div>
+
+        <div class="col-12 col-md-8">
+
+            <div class="card mb-5">
+                <div class="card-header py-2 fs-5 fw-bold">
+                    Variant Informations
+                </div>
+                <div class="card-body p-2">
+                    <ul class="list-group list-group-flush mb-0">
+                        <li class="list-group-item py-1"><strong>Variant Name:</strong> {{ variant.name }}</li>
+                        <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
+                        <li class="list-group-item py-1"><strong>Parent Rocket:</strong> 
+                            <a href="{{ base_url }}/rocket/{{ rocket.slug }}.html">{{ rocket.name }}</a>
+                        </li>
+                        {% if rocket.agency %}
+                        <li class="list-group-item py-1"><strong>Agency:</strong> {{ rocket.agency }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+
+            {% if variant.remarks %}
+            <div class="card mb-3">
+                <div class="card-header py-2 fw-bold">Remarks</div>
+                <div class="card-body p-2">
+                    <p class="mb-0">{{ variant.remarks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

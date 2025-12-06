@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="{{ base_url }}/index.html" class="btn btn-secondary mb-3">Back to homepage</a>
+<nav aria-label="breadcrumb" class="mb-3 d-flex justify-content-between align-items-center bg-light rounded p-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{{ base_url }}/">Home</a></li>
+        <li class="breadcrumb-item active"><a href="{{ base_url }}/rockets.html">Rockets</a></li>
+    </ol>
 
-<div class="mb-3 position-relative" style="width: 300px;">
-    <input type="text" id="rocket-search" class="form-control" placeholder="Search rocket...">
-    <div id="search-results" class="border position-absolute bg-white w-100" style="z-index:100; display:none;"></div>
-</div>
+    <div class="position-relative" style="width: 300px;">
+        <input type="text" id="rocket-search" class="form-control" placeholder="Search rocket...">
+        <div id="search-results" class="border position-absolute bg-white w-100" style="z-index:100; display:none;"></div>
+    </div>
+</nav>
+
 
 <div class="table-responsive">
     <table class="table table-striped table-hover ">

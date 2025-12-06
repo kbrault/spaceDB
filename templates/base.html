@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ title }}</title>
+    <title>{{ title }} - rocketDB</title>
 
     {% if description %}
     <meta name="description" content="{{ description }}">
@@ -17,21 +17,43 @@
 </head>
 
 <body>
-<header class="bg-light">
-    <div class="w-100 bg-dark text-white py-3">
-        <div class="container">
-            <h1 class="m-0 py-3">
-                <a href="{{ base_url }}/" class="text-white text-decoration-none">rocketDB</a>
-            </h1>
+    <header class="bg-light">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-1" href="{{ base_url }}/">rocketDB</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ base_url }}/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ base_url }}/rockets.html">Rockets</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ base_url }}/launches.html">Launches</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ base_url }}/about.html">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        {% if show_title %}
+        <div class="container mt-3">
+            <h2 class="pb-3 fw-bold fs-2">{{ title }}</h2>
         </div>
-    </div>
-    <div class="container mt-3">
-        <h2 class="pb-3">{{ title }}</h2>
-    </div>
-</header>
+        {% endif %}
 
 
-
+    </header>
 
     <main class="container mb-5 mt-3">
         {% block content %}{% endblock %}
