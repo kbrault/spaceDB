@@ -1,11 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="list-group">
-    {% for page in pages %}
-    <a href="{{ base_url }}/{{ page.url }}" class="list-group-item list-group-item-action">
-        {{ page.title }}
-    </a>
-    {% endfor %}
+
+<div class="bg-light border py-5 mb-3 rounded">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Welcome to RocketDB</h1>
+        <p class="lead mb-4">Explore rockets and launches across history and space agencies</p>
+        <a href="{{ base_url }}/rockets.html" class="btn btn-primary btn-lg">Browse Rockets</a>
+        <a href="{{ base_url }}/launches.html" class="btn btn-warning btn-lg">Browse Launches</a>
+    </div>
 </div>
+
+<div class="container">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header fw-bold fs-5">Database Statistics</div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <a href="{{ base_url }}/rockets.html" class="btn btn-outline-primary">View Statistics</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header fw-bold fs-5">Help Us</div>
+                <div class="card-body">
+                    <p class="card-text">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <a href="{{ base_url }}/about.html" class="btn btn-outline-primary">Contribute</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -42,30 +42,32 @@
                 </div>
             </div>
 
-{% if rocket.variants %}
-<h3>Variants</h3>
-<div class="row g-3">
-    {% for variant in rocket.variants %}
-    <div class="col-12 col-lg-6 mb-3">
-        <div class="card">
-            <div class="card-header py-2 fw-bold">
-                <a href="{{ base_url }}/rocket/{{ rocket.slug }}/{{ variant.slug }}.html" class="text-decoration-none">
-                    {{ variant.name }}
-                </a>
+            {% if rocket.variants %}
+            <h3>Variants</h3>
+            <div class="row g-3">
+                {% for variant in rocket.variants %}
+                <div class="col-12 col-lg-6 mb-3">
+                    <div class="card">
+                        <div class="card-header py-2 fw-bold">
+                            <a href="{{ base_url }}/rocket/{{ rocket.slug }}/{{ variant.slug }}.html"
+                                class="text-decoration-none">
+                                {{ variant.name }}
+                            </a>
+                        </div>
+                        <div class="card-body p-2">
+                            <ul class="list-group list-group-flush mb-0">
+                                {% if variant.agency %}
+                                <li class="list-group-item py-1"><strong>Agency:</strong> {{ variant.agency }}</li>
+                                {% endif %}
+                                <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight
+                                    }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            <div class="card-body p-2">
-                <ul class="list-group list-group-flush mb-0">
-                    {% if variant.agency %}
-                    <li class="list-group-item py-1"><strong>Agency:</strong> {{ variant.agency }}</li>
-                    {% endif %}
-                    <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-{% endif %}
+            {% endif %}
 
 
         </div>
@@ -74,7 +76,7 @@
 
 <div class="card mb-3">
     <div class="card-header py-2 fs-4 fw-bold">
-        Launches
+{{ rocket.name }} launches
     </div>
     <div class="card-body p-2">
         <ul class="list-group list-group-flush mb-0">
