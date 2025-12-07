@@ -33,14 +33,39 @@
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush mb-0">
+
+                        {% if rocket.manufacturer and rocket.manufacturer != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Manufacturer:</strong> {{ rocket.manufacturer }}</li>
+                        {% endif %}
+
+                        {% if rocket.first_flight and rocket.first_flight != "Unknown" %}
                         <li class="list-group-item py-1"><strong>First Flight:</strong> {{ rocket.first_flight }}</li>
+                        {% endif %}
+
+                        {% if rocket.rocket_height and rocket.rocket_height != 0 %}
                         <li class="list-group-item py-1"><strong>Height:</strong> {{ rocket.rocket_height }} m</li>
+                        {% endif %}
+
+                        {% if rocket.stages and rocket.stages != 0 %}
                         <li class="list-group-item py-1"><strong>Stages:</strong> {{ rocket.stages }}</li>
+                        {% endif %}
+
+                        {% if rocket.strap_ons and rocket.strap_ons != 0 %}
                         <li class="list-group-item py-1"><strong>Strap-ons:</strong> {{ rocket.strap_ons }}</li>
+                        {% endif %}
+
+                        {% if rocket.liftoff_thrust and rocket.liftoff_thrust != 0 %}
                         <li class="list-group-item py-1"><strong>Liftoff Thrust:</strong> {{ rocket.liftoff_thrust }} kN</li>
+                        {% endif %}
+
+                        {% if rocket.payload_LEO and rocket.payload_LEO != 0 %}
                         <li class="list-group-item py-1"><strong>Payload to LEO:</strong> {{ rocket.payload_LEO }} kg</li>
+                        {% endif %}
+
+                        {% if rocket.payload_GTO and rocket.payload_GTO != 0 %}
                         <li class="list-group-item py-1"><strong>Payload to GTO:</strong> {{ rocket.payload_GTO }} kg</li>
+                        {% endif %}
+
                     </ul>
                 </div>
             </div>
@@ -53,13 +78,17 @@
                     <div class="card">
                         <div class="card-header py-2 fw-bold">
                             <a href="{{ base_url }}/rocket/{{ rocket.slug }}/{{ variant.slug }}.html"
-                                class="text-decoration-none">
+                               class="text-decoration-none">
                                 {{ variant.name }}
                             </a>
                         </div>
                         <div class="card-body p-2">
                             <ul class="list-group list-group-flush mb-0">
+
+                                {% if variant.first_flight and variant.first_flight != "Unknown" %}
                                 <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
+                                {% endif %}
+
                             </ul>
                         </div>
                     </div>
@@ -67,6 +96,7 @@
                 {% endfor %}
             </div>
             {% endif %}
+
         </div>
     </div>
 </div>

@@ -33,15 +33,33 @@
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush mb-0">
+                        {% if variant.manufacturer != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Manufacturer:</strong> {{ variant.manufacturer }}</li>
+                        {% endif %}
+                        {% if variant.first_flight != 0 and variant.first_flight != "Unknown" %}
                         <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
+                        {% endif %}
+                        {% if variant.rocket_height != 0 and variant.rocket_height != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Height:</strong> {{ variant.rocket_height }} m</li>
+                        {% endif %}
+                        {% if variant.stages != 0 and variant.stages != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Stages:</strong> {{ variant.stages }}</li>
+                        {% endif %}
+                        {% if variant.strap_ons != 0 and variant.strap_ons != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Strap-ons:</strong> {{ variant.strap_ons }}</li>
+                        {% endif %}
+                        {% if variant.liftoff_thrust != 0 and variant.liftoff_thrust != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Liftoff Thrust:</strong> {{ variant.liftoff_thrust }} kN</li>
+                        {% endif %}
+                        {% if variant.payload_LEO != 0 and variant.payload_LEO != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Payload to LEO:</strong> {{ variant.payload_LEO }} kg</li>
+                        {% endif %}
+                        {% if variant.payload_GTO != 0 and variant.payload_GTO != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Payload to GTO:</strong> {{ variant.payload_GTO }} kg</li>
+                        {% endif %}
+                        {% if variant.price != 0 and variant.price != "Unknown" %}
                         <li class="list-group-item py-1"><strong>Price:</strong> ${{ variant.price }}</li>
+                        {% endif %}
                         <li class="list-group-item py-1"><strong>Baseline Rocket:</strong> 
                             <a href="{{ base_url }}/rocket/{{ rocket.slug }}.html">{{ rocket.name }}</a>
                         </li>
