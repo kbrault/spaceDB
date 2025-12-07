@@ -7,7 +7,17 @@
       "name": { "type": "string" },
       "slug": { "type": "string" },
       "manufacturer": { "type": "string" },
-      "first_flight": { "type": "integer" },
+      "first_flight": { "type": "integer", "default": 0 },
+      "status": { "type": "string", "enum": ["Retired", "Active", "Planned"], "default": "Planned" },
+      "price": { "type": "integer", "default": 0 },
+      "liftoff_thrust": { "type": "integer", "default": 0 },
+      "payload_LEO": { "type": "integer", "default": 0 },
+      "payload_GTO": { "type": "integer", "default": 0 },
+      "stages": { "type": "integer", "default": 0 },
+      "strap_ons": { "type": "integer", "default": 0 },
+      "rocket_height": { "type": "number", "default": 0 },
+      "fairing_diameter": { "type": "number", "default": 0 },
+      "fairing_height": { "type": "number", "default": 0 },
       "variants": {
         "type": "array",
         "items": {
@@ -15,21 +25,22 @@
           "properties": {
             "name": { "type": "string" },
             "slug": { "type": "string" },
-            "first_flight": { "type": "integer" },
-            "status": { "type": "string", "enum": ["Retired", "Active", "Planned"] },
-            "price": { "type": "integer" },
-            "liftoff_thrust": { "type": "integer" },
-            "payload_LEO": { "type": "integer" },
-            "payload_GTO": { "type": "integer" },
-            "stages": { "type": "integer" },
-            "strap_ons": { "type": "integer" },
-            "rocket_height": { "type": "number" },
-            "fairing_diameter": { "type": "number" },
-            "fairing_height": { "type": "number" }
+            "first_flight": { "type": "integer", "default": 0 },
+            "status": { "type": "string", "enum": ["Retired", "Active", "Planned"], "default": "Planned" },
+            "price": { "type": "integer", "default": 0 },
+            "liftoff_thrust": { "type": "integer", "default": 0 },
+            "payload_LEO": { "type": "integer", "default": 0 },
+            "payload_GTO": { "type": "integer", "default": 0 },
+            "stages": { "type": "integer", "default": 0 },
+            "strap_ons": { "type": "integer", "default": 0 },
+            "rocket_height": { "type": "number", "default": 0 },
+            "fairing_diameter": { "type": "number", "default": 0 },
+            "fairing_height": { "type": "number", "default": 0 }
           },
           "required": ["name", "slug"],
           "additionalProperties": false
-        }
+        },
+        "default": []
       }
     },
     "required": ["name", "slug", "manufacturer"],
