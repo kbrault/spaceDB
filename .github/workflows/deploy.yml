@@ -8,13 +8,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    # Essential: Still requires write permissions for pushing the gh-pages branch
     permissions:
       contents: write
 
     steps:
       - name: Checkout repository (Main Branch)
-        # Check out the main branch, where the source code and build script reside
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -32,25 +30,11 @@ jobs:
 
       - name: 🌐 Deploy to GitHub Pages (Native Git Commands)
         run: |
-          # Configure Git user for the commit
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Checkout the 'gh-pages' branch (or create it if it doesn't exist)
-          # The '--orphan' flag creates a new branch without any parent history.
           git checkout --orphan gh-pages
-          
-          # Remove all previous files in the staging area (since we are replacing them)
           git rm -rf .
-          
-          # Move the compiled site files from the output folder to the root
-          # This assumes your 'output_site' folder contains the final HTML/CSS/JS files
           mv ./output_site/* .
-          
-          # Commit the new files
           git add .
           git commit -m "Deploy SpaceDB site to GitHub Pages"
-          
-          # Force push the new gh-pages branch using the built-in GITHUB_TOKEN
-          # The token is available because 'permissions: contents: write' was set above.
           git push -f origin gh-pages
