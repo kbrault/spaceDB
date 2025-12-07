@@ -14,27 +14,42 @@
 <div class="container">
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="card h-100 text-center">
-                <div class="card-header fw-bold fs-5">Statistics</div>
-                <div class="card-body d-flex flex-column justify-content-center">
-                    <div class="row mb-3">
+            <div class="card h-100">
+
+                <div class="card-header fw-bold fs-5">
+                    Statistics
+                </div>
+
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    Fake numbers for now
+                    <div class="row row-cols-2 g-4">
+                        
                         <div class="col">
-                            <div class="fs-2 fw-bold text-primary">100</div>
-                            <div class="text-muted">Rockets</div>
+                            <div class="p-3 rounded-3 bg-light text-center shadow">
+                                <div class="fs-3 fw-bolder text-primary">67</div>
+                                <div class="text-muted small text-uppercase">Rockets</div>
+                            </div>
                         </div>
+
                         <div class="col">
-                            <div class="fs-2 fw-bold text-success">100</div>
-                            <div class="text-muted">Launches</div>
+                            <div class="p-3 rounded-3 bg-light text-center shadow">
+                                <div class="fs-3 fw-bolder text-warning">871</div>
+                                <div class="text-muted small text-uppercase">Launches</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
+
                         <div class="col">
-                            <div class="fs-2 fw-bold text-warning">100</div>
-                            <div class="text-muted">Variants</div>
+                            <div class="p-3 rounded-3 bg-light text-center shadow">
+                                <div class="fs-3 fw-bolder text-success">3212</div>
+                                <div class="text-muted small text-uppercase">Variants</div>
+                            </div>
                         </div>
+
                         <div class="col">
-                            <div class="fs-2 fw-bold text-danger">100</div>
-                            <div class="text-muted">Failures</div>
+                            <div class="p-3 rounded-3 bg-light text-center shadow">
+                                <div class="fs-3 fw-bolder text-danger ">100</div>
+                                <div class="text-muted small text-uppercase">Other</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -44,17 +59,24 @@
 
         <div class="col-md-6">
             <div class="card h-100">
-                <div class="card-header fw-bold fs-5">Help Us</div>
+                <div class="card-header fw-bold fs-5">About</div>
                 <div class="card-body">
                     <p class="card-text">
-                        This project is an open-source database aiming to collect comprehensive information about
-                        rockets and their launches. Contributions are welcome—help expand and improve the dataset by
-                        adding or updating information on GitHub.
+                        <span class="fw-bold">RocketDB</span> is an open-source database aiming to collect comprehensive information about
+                        rockets and their launches. You can help the project in the following ways:
                     </p>
+                    <ul class="card-text">
+                        <li>Add new data to the database.</li>
+                        <li>Update information on existing rockets and launches.</li>
+                        <li>Report errors or inconsistencies in the data.</li>
+                        <li>Share the project with others interested in rockets.</li>
+                        <li>Contribute to the project code or documentation on GitHub.</li>
+                    </ul>
                     <a href="{{ base_url }}/about.html" class="btn btn-outline-primary">Contribute</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 

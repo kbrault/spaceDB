@@ -15,7 +15,7 @@ OUTPUT_DIR = Path("output_site")
 TEMPLATE_DIR = Path("templates")
 ASSETS_DIR = Path("assets")
 
-ITEMS_PER_PAGE = 10
+ITEMS_PER_PAGE = 2
 BASE_URL = "http://127.0.0.1:5500/output_site"
 
 INDEX_TITLE = "Home"
