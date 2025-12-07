@@ -15,7 +15,7 @@ OUTPUT_DIR = Path("output_site")
 TEMPLATE_DIR = Path("templates")
 ASSETS_DIR = Path("assets")
 
-ITEMS_PER_PAGE = 2
+ITEMS_PER_PAGE = 25
 BASE_URL = "http://127.0.0.1:5500/output_site"
 
 INDEX_TITLE = "Home"
@@ -26,8 +26,8 @@ ROCKETS_TITLE_PATTERN = "Rockets – Page {page_num}"
 ROCKETS_DESCRIPTION_PATTERN = "RocketDB listing rockets – page {page_num}"
 ROCKETS_CANONICAL_PATTERN = "rockets{page_suffix}.html"
 
-ROCKET_TITLE_PATTERN = "{rocket_name} ({agency})"
-ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Agency: {agency}, First Flight: {first_flight}"
+ROCKET_TITLE_PATTERN = "{rocket_name} ({manufacturer})"
+ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Manufacturer: {manufacturer}, First Flight: {first_flight}"
 ROCKET_CANONICAL_PATTERN = "rocket/{slug}.html"
 
 # -----------------------------
@@ -47,7 +47,7 @@ def render_template(env, template_name, output_path, **context):
 # -----------------------------
 # Page Generators
 # -----------------------------
-def generate_index(env, pages, current_date):
+def generate_index(env, pages, current_date, num_rockets=0, num_variants=0):
     render_template(
         env, "index.html", OUTPUT_DIR / "index.html",
         title=INDEX_TITLE,
@@ -55,8 +55,11 @@ def generate_index(env, pages, current_date):
         canonical=INDEX_CANONICAL,
         pages=pages,
         date=current_date,
-        base_url=BASE_URL
+        base_url=BASE_URL,
+        num_rockets=num_rockets,
+        num_variants=num_variants
     )
+
 
 def generate_rockets_pages(env, rockets, current_date):
     total_pages = math.ceil(len(rockets) / ITEMS_PER_PAGE)
@@ -94,10 +97,10 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
         canonical_url = f"{BASE_URL}/{ROCKET_CANONICAL_PATTERN.format(slug=rocket['slug'])}"
         render_template(
             env, "rocket.html", rocket_path,
-            title=ROCKET_TITLE_PATTERN.format(rocket_name=rocket["name"], agency=rocket["agency"]),
+            title=ROCKET_TITLE_PATTERN.format(rocket_name=rocket["name"], manufacturer=rocket["manufacturer"]),
             description=ROCKET_DESCRIPTION_PATTERN.format(
                 rocket_name=rocket["name"],
-                agency=rocket["agency"],
+                manufacturer=rocket["manufacturer"],
                 first_flight=rocket["first_flight"]
             ),
             canonical=canonical_url,
@@ -115,7 +118,7 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
             canonical_url = f"{BASE_URL}/rocket/{rocket['slug']}/{variant['slug']}.html"
             render_template(
                 env, "variant.html", variant_path,
-                title=f"{variant['name']} ({rocket['agency']})",
+                title=f"{variant['name']} ({rocket['manufacturer']})",
                 description=f"{variant['name']} – First Flight: {variant['first_flight']}",
                 canonical=canonical_url,
                 variant=variant,
@@ -136,7 +139,7 @@ def main():
     rockets = load_json(ROCKETS_FILE)
     validate_json(rockets, load_json(ROCKETS_SCHEMA_FILE))
     pages = load_json(PAGES_FILE)
-    rockets.sort(key=lambda r: r["first_flight"])
+    rockets.sort(key=lambda r: r["name"])
 
     # Prepare output
     remove_and_recreate_dir(OUTPUT_DIR)
@@ -147,7 +150,10 @@ def main():
     env.globals["base_url"] = BASE_URL
 
     # Generate pages
-    generate_index(env, pages, current_date)
+    total_rockets = len(rockets)
+    total_variants = sum(len(r.get("variants", [])) for r in rockets)
+
+    generate_index(env, pages, current_date, num_rockets=total_rockets, num_variants=total_variants)
     generate_rockets_pages(env, rockets, current_date)
     generate_rocket_and_variant_pages(env, rockets, current_date)
 

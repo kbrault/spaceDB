@@ -6,7 +6,7 @@
     "properties": {
       "name": { "type": "string" },
       "slug": { "type": "string" },
-      "agency": { "type": "string" },
+      "manufacturer": { "type": "string" },
       "first_flight": { "type": "integer" },
       "variants": {
         "type": "array",
@@ -15,14 +15,24 @@
           "properties": {
             "name": { "type": "string" },
             "slug": { "type": "string" },
-            "first_flight": { "type": "integer" }
+            "first_flight": { "type": "integer" },
+            "status": { "type": "string", "enum": ["Retired", "Active", "Planned"] },
+            "price": { "type": "integer" },
+            "liftoff_thrust": { "type": "integer" },
+            "payload_LEO": { "type": "integer" },
+            "payload_GTO": { "type": "integer" },
+            "stages": { "type": "integer" },
+            "strap_ons": { "type": "integer" },
+            "rocket_height": { "type": "number" },
+            "fairing_diameter": { "type": "number" },
+            "fairing_height": { "type": "number" }
           },
-          "required": ["name", "slug", "first_flight"],
+          "required": ["name", "slug"],
           "additionalProperties": false
         }
       }
     },
-    "required": ["name", "slug", "agency", "first_flight"],
+    "required": ["name", "slug", "manufacturer"],
     "additionalProperties": false
   }
 }

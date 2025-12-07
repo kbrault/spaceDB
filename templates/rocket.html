@@ -10,7 +10,6 @@
     </ol>
 </nav>
 
-
 <div class="card mb-3 p-3">
     <div class="row g-3 align-items-start">
         <div class="col-12 col-md-4">
@@ -25,19 +24,23 @@
                 {% endif %}
                 <figcaption class="figure-caption text-center mt-2">{{ rocket.name }}</figcaption>
             </figure>
-
         </div>
 
         <div class="col-12 col-md-8">
-
             <div class="card mb-5">
                 <div class="card-header py-2 fs-5 fw-bold">
                     Rocket Informations
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush mb-0">
-                        <li class="list-group-item py-1"><strong>Agency:</strong> {{ rocket.agency }}</li>
+                        <li class="list-group-item py-1"><strong>Manufacturer:</strong> {{ rocket.manufacturer }}</li>
                         <li class="list-group-item py-1"><strong>First Flight:</strong> {{ rocket.first_flight }}</li>
+                        <li class="list-group-item py-1"><strong>Height:</strong> {{ rocket.rocket_height }} m</li>
+                        <li class="list-group-item py-1"><strong>Stages:</strong> {{ rocket.stages }}</li>
+                        <li class="list-group-item py-1"><strong>Strap-ons:</strong> {{ rocket.strap_ons }}</li>
+                        <li class="list-group-item py-1"><strong>Liftoff Thrust:</strong> {{ rocket.liftoff_thrust }} kN</li>
+                        <li class="list-group-item py-1"><strong>Payload to LEO:</strong> {{ rocket.payload_LEO }} kg</li>
+                        <li class="list-group-item py-1"><strong>Payload to GTO:</strong> {{ rocket.payload_GTO }} kg</li>
                     </ul>
                 </div>
             </div>
@@ -56,11 +59,7 @@
                         </div>
                         <div class="card-body p-2">
                             <ul class="list-group list-group-flush mb-0">
-                                {% if variant.agency %}
-                                <li class="list-group-item py-1"><strong>Agency:</strong> {{ variant.agency }}</li>
-                                {% endif %}
-                                <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight
-                                    }}</li>
+                                <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
                             </ul>
                         </div>
                     </div>
@@ -68,67 +67,40 @@
                 {% endfor %}
             </div>
             {% endif %}
-
-
         </div>
     </div>
 </div>
 
 <div class="card mb-3">
     <div class="card-header py-2 fs-4 fw-bold">
-        {{ rocket.name }} launches (total: 32)
+        {{ rocket.name }} launches (total: {{ rocket.missions | default(0) }})
     </div>
     <div class="card-body p-2">
         <div class="list-group list-group-flush mb-0">
-
-            <a href="/launch/1" class="list-group-item list-group-item-action py-1 text-decoration-none">
+            {% for launch in rocket.launches | default([]) %}
+            <a href="{{ base_url }}/launch/{{ launch.id }}" class="list-group-item list-group-item-action py-1 text-decoration-none">
                 <div class="d-flex align-items-center">
                     <div class="me-3" style="width: 110px; flex-shrink: 0;">
-                        <span>2021-03-04</span>
+                        <span>{{ launch.date }}</span>
                     </div>
                     <div class="flex-grow-1">
-                        <strong>Starlink 17</strong><br>
-                        <small>Variant: Falcon 9 Block 5</small>
+                        <strong>{{ launch.name }}</strong><br>
+                        <small>Variant: {{ launch.variant }}</small>
                     </div>
                     <div class="ms-3">
-                        <span class="badge bg-success text-white py-2 px-2">Success</span>
+                        <span class="badge 
+                            {% if launch.status == 'Success' %}bg-success
+                            {% elif launch.status == 'Partial Failure' %}bg-warning
+                            {% else %}bg-danger{% endif %}
+                            text-white py-2 px-2">{{ launch.status }}</span>
                     </div>
                 </div>
             </a>
-
-            <a href="/launch/2" class="list-group-item list-group-item-action py-1 text-decoration-none">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
-                        <span>2021-01-24</span>
-                    </div>
-                    <div class="flex-grow-1">
-                        <strong>Transporter-1</strong><br>
-                        <small>Variant: Falcon 9 Block 5</small>
-                    </div>
-                    <div class="ms-3">
-                        <span class="badge bg-success text-white py-2 px-2">Success</span>
-                    </div>
-                </div>
-            </a>
-
-            <a href="/launch/3" class="list-group-item list-group-item-action py-1 text-decoration-none">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
-                        <span>2022-11-16</span>
-                    </div>
-                    <div class="flex-grow-1">
-                        <strong>Artemis I</strong><br>
-                        <small>Variant: SLS Block 1</small>
-                    </div>
-                    <div class="ms-3">
-                        <span class="badge bg-danger text-white py-2 px-2">Failure</span>
-                    </div>
-                </div>
-            </a>
-
+            {% else %}
+            <div class="text-muted p-2">No launches available.</div>
+            {% endfor %}
         </div>
     </div>
 </div>
-
 
 {% endblock %}

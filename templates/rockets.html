@@ -8,7 +8,7 @@
     </ol>
 
     <div class="position-relative" style="width: 300px;">
-        <input type="text" id="rocket-search" class="form-control" placeholder="Search rocket...">
+        <input type="text" id="rocket-search" class="form-control" placeholder="TODO ...">
         <div id="search-results" class="border position-absolute bg-white w-100" style="z-index:100; display:none;"></div>
     </div>
 </nav>
@@ -18,7 +18,7 @@
         <thead class="thead-light">
             <tr>
                 <th>Name</th>
-                <th>Agency</th>
+                <th>Manufacturer</th>
                 <th>First Flight</th>
             </tr>
         </thead>
@@ -28,7 +28,7 @@
                 <td>
                     <a href="{{ base_url }}/rocket/{{ rocket.slug }}.html">{{ rocket.name }}</a>
                 </td>
-                <td>{{ rocket.agency }}</td>
+                <td>{{ rocket.manufacturer }}</td>
                 <td>{{ rocket.first_flight }}</td>
             </tr>
             {% endfor %}
@@ -57,48 +57,5 @@
     </ul>
 </nav>
 
-<script>
-    const rockets = [
-        {% for rocket in rockets %}
-        { name: "{{ rocket.name }}", url: "{{ base_url }}/rocket/{{ rocket.slug }}.html" }{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ];
 
-    const input = document.getElementById('rocket-search');
-    const results = document.getElementById('search-results');
-
-    input.addEventListener('input', function() {
-        const query = this.value.toLowerCase();
-        results.innerHTML = '';
-        if (!query) {
-            results.style.display = 'none';
-            return;
-        }
-        // only the 10 first result
-        const matches = rockets.filter(r => r.name.toLowerCase().includes(query)).slice(0, 10);
-
-        if (matches.length === 0) {
-            results.style.display = 'none';
-            return;
-        }
-        matches.forEach(r => {
-            const div = document.createElement('div');
-            div.textContent = r.name;
-            div.className = 'p-2 search-result';
-            div.style.cursor = 'pointer';
-            div.addEventListener('click', () => {
-                window.location.href = r.url;
-            });
-            results.appendChild(div);
-        });
-        results.style.display = 'block';
-    });
-
-    // Hide dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!input.contains(e.target) && !results.contains(e.target)) {
-            results.style.display = 'none';
-        }
-    });
-</script>
 {% endblock %}
