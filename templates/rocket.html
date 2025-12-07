@@ -76,43 +76,59 @@
 
 <div class="card mb-3">
     <div class="card-header py-2 fs-4 fw-bold">
-{{ rocket.name }} launches
+        {{ rocket.name }} launches (total: 32)
     </div>
     <div class="card-body p-2">
-        <ul class="list-group list-group-flush mb-0">
-            <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                <div>
-                    <span class="me-3">2021-03-04</span>
-                    <strong>Starlink 17</strong><br>
-                    <small>Variant: Falcon 9 Block 5</small>
-                </div>
-                <span class="badge bg-success text-white py-2 px-2">Success</span>
-            </li>
+        <div class="list-group list-group-flush mb-0">
 
-            <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                <div>
-                    <span class="me-3">2021-01-24</span>
-                    <strong>Transporter-1</strong><br>
-                    <small>Variant: Falcon 9 Block 5</small>
+            <a href="/launch/1" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2021-03-04</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Starlink 17</strong><br>
+                        <small>Variant: Falcon 9 Block 5</small>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-success text-white py-2 px-2">Success</span>
+                    </div>
                 </div>
-                <span class="badge bg-success text-white py-2 px-2">Success</span>
-            </li>
+            </a>
 
-            <li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                <div>
-                    <span class="me-3">2022-11-16</span>
-                    <strong>Artemis I</strong><br>
-                    <small>Variant: SLS Block 1</small>
+            <a href="/launch/2" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2021-01-24</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Transporter-1</strong><br>
+                        <small>Variant: Falcon 9 Block 5</small>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-success text-white py-2 px-2">Success</span>
+                    </div>
                 </div>
-                <span class="badge bg-danger text-white py-2 px-2">Failure</span>
-            </li>
-        </ul>
+            </a>
+
+            <a href="/launch/3" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2022-11-16</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Artemis I</strong><br>
+                        <small>Variant: SLS Block 1</small>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-danger text-white py-2 px-2">Failure</span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
     </div>
 </div>
-
-
-
-
 
 
 {% endblock %}

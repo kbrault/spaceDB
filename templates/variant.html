@@ -34,15 +34,11 @@
                 </div>
                 <div class="card-body p-2">
                     <ul class="list-group list-group-flush mb-0">
-                        <li class="list-group-item py-1"><strong>Variant Name:</strong> {{ variant.name }}</li>
+                        <li class="list-group-item py-1"><strong>Agency:</strong> {{ rocket.agency }}</li>
                         <li class="list-group-item py-1"><strong>First Flight:</strong> {{ variant.first_flight }}</li>
-                        <li class="list-group-item py-1"><strong>Parent Rocket:</strong> 
+                        <li class="list-group-item py-1"><strong>Baseline:</strong> 
                             <a href="{{ base_url }}/rocket/{{ rocket.slug }}.html">{{ rocket.name }}</a>
                         </li>
-                        {% if rocket.agency %}
-                        <li class="list-group-item py-1"><strong>Agency:</strong> {{ rocket.agency }}</li>
-                        {% endif %}
-                    </ul>
                 </div>
             </div>
 
@@ -58,4 +54,58 @@
         </div>
     </div>
 </div>
+
+<div class="card mb-3">
+    <div class="card-header py-2 fs-4 fw-bold">
+        {{ rocket.name }} launches (total: 32)
+    </div>
+    <div class="card-body p-2">
+        <div class="list-group list-group-flush mb-0">
+
+            <a href="/launch/1" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2021-03-04</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Starlink 17</strong><br>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-success text-white py-2 px-2">Success</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/launch/2" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2021-01-24</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Transporter-1</strong><br>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-success text-white py-2 px-2">Success</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/launch/3" class="list-group-item list-group-item-action py-1 text-decoration-none">
+                <div class="d-flex align-items-center">
+                    <div class="me-3" style="width: 110px; flex-shrink: 0;">
+                        <span>2022-11-16</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Artemis I</strong><br>
+                    </div>
+                    <div class="ms-3">
+                        <span class="badge bg-danger text-white py-2 px-2">Failure</span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+
 {% endblock %}
