@@ -16,19 +16,15 @@ TEMPLATE_DIR = Path("templates")
 ASSETS_DIR = Path("assets")
 
 ITEMS_PER_PAGE = 25
-BASE_URL = "http://127.0.0.1:5500/output_site"
 
 INDEX_TITLE = "Home"
-INDEX_DESCRIPTION = "RocketDB home page listing rocket pages"
-INDEX_CANONICAL = f"{BASE_URL}/index.html"
+INDEX_DESCRIPTION = "SpaceDB home page listing rocket pages"
 
 ROCKETS_TITLE_PATTERN = "Rockets – Page {page_num}"
-ROCKETS_DESCRIPTION_PATTERN = "RocketDB listing rockets – page {page_num}"
-ROCKETS_CANONICAL_PATTERN = "rockets{page_suffix}.html"
+ROCKETS_DESCRIPTION_PATTERN = "SpaceDB listing rockets – page {page_num}"
 
 ROCKET_TITLE_PATTERN = "{rocket_name} ({manufacturer})"
 ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Manufacturer: {manufacturer}, First Flight: {first_flight}"
-ROCKET_CANONICAL_PATTERN = "rocket/{slug}.html"
 
 # -----------------------------
 # Helper Functions
@@ -44,22 +40,32 @@ def render_template(env, template_name, output_path, **context):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(template.render(**context), encoding="utf-8")
 
+def compute_base_url(output_path: Path):
+    depth = len(output_path.relative_to(OUTPUT_DIR).parents) - 1
+    if depth <= 0:
+        return ""
+    return "../" * depth
+
+def compute_home_link(output_path: Path):
+    return compute_base_url(output_path) + "index.html"
+
 # -----------------------------
 # Page Generators
 # -----------------------------
 def generate_index(env, pages, current_date, num_rockets=0, num_variants=0):
+    output_path = OUTPUT_DIR / "index.html"
     render_template(
-        env, "index.html", OUTPUT_DIR / "index.html",
+        env, "index.html", output_path,
         title=INDEX_TITLE,
         description=INDEX_DESCRIPTION,
-        canonical=INDEX_CANONICAL,
+        canonical="index.html",
         pages=pages,
         date=current_date,
-        base_url=BASE_URL,
+        base_url=compute_base_url(output_path),
+        home_link=compute_home_link(output_path),
         num_rockets=num_rockets,
         num_variants=num_variants
     )
-
 
 def generate_rockets_pages(env, rockets, current_date):
     total_pages = math.ceil(len(rockets) / ITEMS_PER_PAGE)
@@ -72,19 +78,19 @@ def generate_rockets_pages(env, rockets, current_date):
 
         page_suffix = "" if page_num == 1 else f"_page_{page_num}"
         rockets_path = OUTPUT_DIR / (f"rockets.html" if page_num == 1 else f"rockets_page_{page_num}.html")
-        canonical_url = f"{BASE_URL}/{ROCKETS_CANONICAL_PATTERN.format(page_suffix=page_suffix)}"
 
         render_template(
             env, template_name, rockets_path,
             title=ROCKETS_TITLE_PATTERN.format(page_num=page_num),
             description=ROCKETS_DESCRIPTION_PATTERN.format(page_num=page_num),
-            canonical=canonical_url,
+            canonical=f"{rockets_path.name}",
             rockets=rockets_page,
             current_page=page_num,
             total_pages=total_pages,
             pagination=pagination,
             date=current_date,
-            base_url=BASE_URL
+            base_url=compute_base_url(rockets_path),
+            home_link=compute_home_link(rockets_path)
         )
 
 def generate_rocket_and_variant_pages(env, rockets, current_date):
@@ -92,82 +98,34 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
     rocket_dir.mkdir(parents=True, exist_ok=True)
 
     for rocket in rockets:
+        rocket.setdefault("manufacturer", "Unknown")
+        rocket.setdefault("first_flight", "Unknown")
+        rocket.setdefault("rocket_height", 0)
+        rocket.setdefault("stages", 0)
+        rocket.setdefault("strap_ons", 0)
+        rocket.setdefault("liftoff_thrust", 0)
+        rocket.setdefault("payload_LEO", 0)
+        rocket.setdefault("payload_GTO", 0)
+        rocket.setdefault("missions", 0)
+        rocket.setdefault("launches", [])
 
-        # Ensure rocket fields always contain valid default values
-        rocket["manufacturer"] = rocket.get("manufacturer") or "Unknown"
-        rocket["first_flight"] = rocket.get("first_flight") or "Unknown"
-        rocket["rocket_height"] = rocket.get("rocket_height") or 0
-        rocket["stages"] = rocket.get("stages") or 0
-        rocket["strap_ons"] = rocket.get("strap_ons") or 0
-        rocket["liftoff_thrust"] = rocket.get("liftoff_thrust") or 0
-        rocket["payload_LEO"] = rocket.get("payload_LEO") or 0
-        rocket["payload_GTO"] = rocket.get("payload_GTO") or 0
-        rocket["missions"] = rocket.get("missions") or 0
-        rocket["launches"] = rocket.get("launches") or []
-
-        # Ensure variant fields always contain valid default values
         for v in rocket.get("variants", []):
-            v["name"] = v.get("name") or "Unknown"
-            v["slug"] = v.get("slug") or "unknown"
-            v["first_flight"] = v.get("first_flight") or "Unknown"
-            v["remarks"] = v.get("remarks") or ""
+            v.setdefault("name", "Unknown")
+            v.setdefault("slug", "unknown")
+            v.setdefault("first_flight", "Unknown")
+            v.setdefault("remarks", "")
 
         # Rocket page
         rocket_path = rocket_dir / f"{rocket['slug']}.html"
-        canonical_url = f"{BASE_URL}/{ROCKET_CANONICAL_PATTERN.format(slug=rocket['slug'])}"
         render_template(
             env, "rocket.html", rocket_path,
-            title=ROCKET_TITLE_PATTERN.format(rocket_name=rocket["name"], manufacturer=rocket["manufacturer"]),
-            description=ROCKET_DESCRIPTION_PATTERN.format(
-                rocket_name=rocket["name"],
-                manufacturer=rocket["manufacturer"],
-                first_flight=rocket["first_flight"]
-            ),
-            canonical=canonical_url,
+            title=f"{rocket['name']} ({rocket['manufacturer']})",
+            description=f"{rocket['name']} – Manufacturer: {rocket['manufacturer']}, First Flight: {rocket['first_flight']}",
+            canonical=f"rocket/{rocket['slug']}.html",
             rocket=rocket,
             date=current_date,
-            base_url=BASE_URL,
-            show_title=True
-        )
-
-        # Variant pages
-        variant_dir = rocket_dir / rocket['slug']
-        variant_dir.mkdir(parents=True, exist_ok=True)
-
-        for variant in rocket.get("variants", []):
-            variant_path = variant_dir / f"{variant['slug']}.html"
-            canonical_url = f"{BASE_URL}/rocket/{rocket['slug']}/{variant['slug']}.html"
-            render_template(
-                env, "variant.html", variant_path,
-                title=f"{variant['name']} ({rocket['manufacturer']})",
-                description=f"{variant['name']} – First Flight: {variant['first_flight']}",
-                canonical=canonical_url,
-                variant=variant,
-                rocket=rocket,
-                date=current_date,
-                base_url=BASE_URL,
-                show_title=True
-            )
-
-    rocket_dir = OUTPUT_DIR / "rocket"
-    rocket_dir.mkdir(parents=True, exist_ok=True)
-
-    for rocket in rockets:
-        # Rocket page
-        rocket_path = rocket_dir / f"{rocket['slug']}.html"
-        canonical_url = f"{BASE_URL}/{ROCKET_CANONICAL_PATTERN.format(slug=rocket['slug'])}"
-        render_template(
-            env, "rocket.html", rocket_path,
-            title=ROCKET_TITLE_PATTERN.format(rocket_name=rocket["name"], manufacturer=rocket["manufacturer"]),
-            description=ROCKET_DESCRIPTION_PATTERN.format(
-                rocket_name=rocket["name"],
-                manufacturer=rocket["manufacturer"],
-                first_flight=rocket["first_flight"]
-            ),
-            canonical=canonical_url,
-            rocket=rocket,
-            date=current_date,
-            base_url=BASE_URL,
+            base_url=compute_base_url(rocket_path),
+            home_link=compute_home_link(rocket_path),
             show_title=True
         )
 
@@ -176,16 +134,16 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
         variant_dir.mkdir(parents=True, exist_ok=True)
         for variant in rocket.get("variants", []):
             variant_path = variant_dir / f"{variant['slug']}.html"
-            canonical_url = f"{BASE_URL}/rocket/{rocket['slug']}/{variant['slug']}.html"
             render_template(
                 env, "variant.html", variant_path,
                 title=f"{variant['name']} ({rocket['manufacturer']})",
                 description=f"{variant['name']} – First Flight: {variant['first_flight']}",
-                canonical=canonical_url,
+                canonical=f"rocket/{rocket['slug']}/{variant['slug']}.html",
                 variant=variant,
                 rocket=rocket,
                 date=current_date,
-                base_url=BASE_URL,
+                base_url=compute_base_url(variant_path),
+                home_link=compute_home_link(variant_path),
                 show_title=True
             )
 
@@ -196,21 +154,16 @@ def main():
     start_time = time.time()
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
-    # Load and validate data
     rockets = load_json(ROCKETS_FILE)
     validate_json(rockets, load_json(ROCKETS_SCHEMA_FILE))
     pages = load_json(PAGES_FILE)
     rockets.sort(key=lambda r: r["name"])
 
-    # Prepare output
     remove_and_recreate_dir(OUTPUT_DIR)
     copy_assets(ASSETS_DIR, OUTPUT_DIR / "assets")
 
-    # Setup Jinja2
     env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-    env.globals["base_url"] = BASE_URL
 
-    # Generate pages
     total_rockets = len(rockets)
     total_variants = sum(len(r.get("variants", [])) for r in rockets)
 
@@ -218,19 +171,16 @@ def main():
     generate_rockets_pages(env, rockets, current_date)
     generate_rocket_and_variant_pages(env, rockets, current_date)
 
-    # Count total pages
     total_pages_created = (
-        1 +  # index
-        math.ceil(len(rockets) / ITEMS_PER_PAGE) +  # rockets listing
-        len(rockets) +  # rocket pages
-        sum(len(r.get("variants", [])) for r in rockets)  # variant pages
+        1 +
+        math.ceil(len(rockets) / ITEMS_PER_PAGE) +
+        len(rockets) +
+        sum(len(r.get("variants", [])) for r in rockets)
     )
-
     elapsed_time = time.time() - start_time
     print(f"Site generated in '{OUTPUT_DIR}' folder.")
     print(f"Total pages created: {total_pages_created}")
     print(f"Time elapsed: {elapsed_time:.2f} seconds")
-
 
 if __name__ == "__main__":
     main()
