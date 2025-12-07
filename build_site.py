@@ -3,6 +3,7 @@ import math
 import time
 import json
 import os
+import argparse
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from jsonschema import validate, ValidationError
@@ -102,7 +103,7 @@ def get_pagination_range(current_page, total_pages, delta=3):
 # -----------------------------
 # Page Generators
 # -----------------------------
-def generate_index(env, pages, current_date, num_rockets=0, num_variants=0):
+def generate_index(env, pages, current_date, commit_sha="", num_rockets=0, num_variants=0):
     output_path = OUTPUT_DIR / "index.html"
     render_template(
         env, "index.html", output_path,
@@ -114,10 +115,11 @@ def generate_index(env, pages, current_date, num_rockets=0, num_variants=0):
         base_url=compute_base_url(output_path),
         home_link=compute_home_link(output_path),
         num_rockets=num_rockets,
-        num_variants=num_variants
+        num_variants=num_variants,
+        commit_sha=commit_sha
     )
 
-def generate_rockets_pages(env, rockets, current_date):
+def generate_rockets_pages(env, rockets, current_date, commit_sha=""):
     total_pages = math.ceil(len(rockets) / ITEMS_PER_PAGE)
     template_name = "rockets.html"
 
@@ -126,7 +128,6 @@ def generate_rockets_pages(env, rockets, current_date):
         rockets_page = rockets[start:start + ITEMS_PER_PAGE]
         pagination = get_pagination_range(page_num, total_pages, delta=3)
 
-        page_suffix = "" if page_num == 1 else f"_page_{page_num}"
         rockets_path = OUTPUT_DIR / (f"rockets.html" if page_num == 1 else f"rockets_page_{page_num}.html")
 
         render_template(
@@ -140,10 +141,11 @@ def generate_rockets_pages(env, rockets, current_date):
             pagination=pagination,
             date=current_date,
             base_url=compute_base_url(rockets_path),
-            home_link=compute_home_link(rockets_path)
+            home_link=compute_home_link(rockets_path),
+            commit_sha=commit_sha
         )
 
-def generate_rocket_and_variant_pages(env, rockets, current_date):
+def generate_rocket_and_variant_pages(env, rockets, current_date, commit_sha=""):
     rocket_dir = OUTPUT_DIR / "rocket"
     rocket_dir.mkdir(parents=True, exist_ok=True)
 
@@ -176,7 +178,8 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
             date=current_date,
             base_url=compute_base_url(rocket_path),
             home_link=compute_home_link(rocket_path),
-            show_title=True
+            show_title=True,
+            commit_sha=commit_sha
         )
 
         # Variant pages
@@ -194,13 +197,19 @@ def generate_rocket_and_variant_pages(env, rockets, current_date):
                 date=current_date,
                 base_url=compute_base_url(variant_path),
                 home_link=compute_home_link(variant_path),
-                show_title=True
+                show_title=True,
+                commit_sha=commit_sha
             )
 
 # -----------------------------
 # Main Script
 # -----------------------------
-def main():
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--commit-sha", default="", help="Git commit SHA for footer display")
+    args = parser.parse_args()
+    commit_sha = args.commit_sha
+
     start_time = time.time()
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
@@ -217,9 +226,9 @@ def main():
     total_rockets = len(rockets)
     total_variants = sum(len(r.get("variants", [])) for r in rockets)
 
-    generate_index(env, pages, current_date, num_rockets=total_rockets, num_variants=total_variants)
-    generate_rockets_pages(env, rockets, current_date)
-    generate_rocket_and_variant_pages(env, rockets, current_date)
+    generate_index(env, pages, current_date, commit_sha=commit_sha, num_rockets=total_rockets, num_variants=total_variants)
+    generate_rockets_pages(env, rockets, current_date, commit_sha=commit_sha)
+    generate_rocket_and_variant_pages(env, rockets, current_date, commit_sha=commit_sha)
 
     total_pages_created = (
         1 +
@@ -231,6 +240,3 @@ def main():
     print(f"Site generated in '{OUTPUT_DIR}' folder.")
     print(f"Total pages created: {total_pages_created}")
     print(f"Time elapsed: {elapsed_time:.2f} seconds")
-
-if __name__ == "__main__":
-    main()

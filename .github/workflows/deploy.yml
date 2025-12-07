@@ -12,7 +12,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository (Main Branch)
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -26,15 +26,17 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build site
-        run: python build_site.py
+        run: python build_site.py --commit-sha $GITHUB_SHA
 
-      - name: 🌐 Deploy to GitHub Pages (Native Git Commands)
+      - name: Deploy to GitHub Pages
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan gh-pages
+          git fetch origin gh-pages || git checkout --orphan gh-pages
+          git checkout gh-pages
           git rm -rf .
-          mv ./output_site/* .
+          cp -r output_site/* .
+          touch .nojekyll
           git add .
           git commit -m "Deploy SpaceDB site to GitHub Pages"
           git push -f origin gh-pages
