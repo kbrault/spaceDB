@@ -216,7 +216,7 @@ if __name__ == "__main__":
     rockets = load_json(ROCKETS_FILE)
     validate_json(rockets, load_json(ROCKETS_SCHEMA_FILE))
     pages = load_json(PAGES_FILE)
-    rockets.sort(key=lambda r: r["name"])
+    rockets.sort(key=lambda r: r["name"].lower())
 
     remove_and_recreate_dir(OUTPUT_DIR)
     copy_assets(ASSETS_DIR, OUTPUT_DIR / "assets")
