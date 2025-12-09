@@ -169,11 +169,14 @@ def generate_rockets_listing(env: Environment, pages_data: List[Dict], rockets: 
             pagination=pagination,
             commit_sha=commit_sha
         )
-    logger.info(f"Generated {total_pages} rocket listing page(s).")
+    logger.info(f"Generated {total_pages} rocket and variant listing pages.")
 
 
 def generate_rocket_and_variant_details(env: Environment, pages_data: List[Dict], rockets: List[Dict], commit_sha: str):
     """Generates individual detail pages for each Rocket and Variant, skipping entries without a slug."""
+    rocket_pages_count = 0
+    variant_pages_count = 0
+    
     for rocket in rockets:
         if not (r_slug := rocket.get("slug")):
             logger.warning(f"Skipping detail pages for rocket '{rocket.get('name', 'Unnamed')}' due to missing slug.")
@@ -191,6 +194,7 @@ def generate_rocket_and_variant_details(env: Environment, pages_data: List[Dict]
             rocket=rocket,
             commit_sha=commit_sha
         )
+        rocket_pages_count += 1
 
         # Variant detail pages
         for variant in rocket.get("variants", []):
@@ -210,7 +214,10 @@ def generate_rocket_and_variant_details(env: Environment, pages_data: List[Dict]
                 rocket=rocket,
                 commit_sha=commit_sha
             )
-    logger.info("Completed individual rocket and variant detail pages.")
+            variant_pages_count += 1
+            
+    total_detail_pages = rocket_pages_count + variant_pages_count
+    logger.info(f"Generated {rocket_pages_count} rocket pages and {variant_pages_count} variant pages for a total of {total_detail_pages} detail pages.")
 
 # -----------------------------
 # Main
