@@ -2,18 +2,22 @@ import datetime
 import math
 import time
 import json
-import os
+import logging
+import shutil
 import argparse
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
+from typing import List, Dict, Any, Union
+
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from jsonschema import validate, ValidationError
 
 # -----------------------------
-# Configuration
+# Configuration (Explicitly Defined)
 # -----------------------------
 PAGES_FILE = Path("data/pages.json")
 ROCKETS_FILE = Path("data/rockets.json")
 ROCKETS_SCHEMA_FILE = Path("models/rockets.schema.json")
+
 OUTPUT_DIR = Path("output_site")
 TEMPLATE_DIR = Path("templates")
 ASSETS_DIR = Path("assets")
@@ -21,208 +25,174 @@ ASSETS_DIR = Path("assets")
 ITEMS_PER_PAGE = 30
 
 INDEX_TITLE = "Home"
-INDEX_DESCRIPTION = "SpaceDB home page listing rocket pages"
+ROCKET_LIST_TITLE = "Rockets"
+ABOUT_TITLE = "About SpaceDB"
 
-ROCKETS_TITLE_PATTERN = "Rockets – Page {page_num}"
-ROCKETS_DESCRIPTION_PATTERN = "SpaceDB listing rockets – page {page_num}"
-
-ROCKET_TITLE_PATTERN = "{rocket_name} ({manufacturer})"
-ROCKET_DESCRIPTION_PATTERN = "{rocket_name} – Manufacturer: {manufacturer}, First Flight: {first_flight}"
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s", datefmt="%H:%M:%S")
+logger = logging.getLogger(__name__)
 
 # -----------------------------
-# Helper Functions
+# Utility Functions
 # -----------------------------
-def copy_assets(src_dir: Path, dest_dir: Path):
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    for file_path in src_dir.iterdir():
-        if file_path.is_file():
-            (dest_dir / file_path.name).write_bytes(file_path.read_bytes())
-
-def render_template(env, template_name, output_path, **context):
-    template = env.get_template(template_name)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(template.render(**context), encoding="utf-8")
-
-def compute_base_url(output_path: Path):
-    depth = len(output_path.relative_to(OUTPUT_DIR).parents) - 1
-    if depth <= 0:
-        return ""
-    return "../" * depth
-
-def compute_home_link(output_path: Path):
-    return compute_base_url(output_path) + "index.html"
-
-def load_json(file_path):
-    with open(file_path, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def remove_and_recreate_dir(path):
-    if os.path.exists(path):
-        for entry in os.listdir(path):
-            entry_path = os.path.join(path, entry)
-            if os.path.isfile(entry_path) or os.path.islink(entry_path):
-                os.remove(entry_path)
-            elif os.path.isdir(entry_path):
-                remove_and_recreate_dir(entry_path)
-                os.rmdir(entry_path)
-        try:
-            os.rmdir(path)
-        except OSError:
-            pass
-    os.makedirs(path, exist_ok=True)
-
-def validate_json(data, schema):
+def load_json(file_path: Path) -> Any:
+    """Loads a JSON file."""
     try:
-        validate(instance=data, schema=schema)
-    except ValidationError as e:
-        raise ValueError(f"JSON validation failed: {e}")
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.error(f"File not found: {file_path}")
+        return []
 
-def get_pagination_range(current_page, total_pages, delta=3):
-    range_pages = []
+def cleanup_and_setup(output_path: Path, assets_path: Path):
+    """Safely removes and recreates the output directory, then copies assets."""
+    if output_path.exists():
+        shutil.rmtree(output_path)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    if assets_path.exists():
+        shutil.copytree(assets_path, output_path / "assets", dirs_exist_ok=True)
+    logger.info("Output directory cleaned and assets copied.")
 
-    if current_page - delta > 2:
-        range_pages.append(1)
-        range_pages.append('...')
-        start = current_page - delta
-    else:
-        start = 1
+def compute_base_url(output_path: Path) -> str:
+    """Calculates the relative path (e.g., '../', '../../') to the root index."""
+    try:
+        # Determine depth from output_dir
+        rel_path = output_path.relative_to(OUTPUT_DIR)
+        depth = len(rel_path.parents) - 1
+        return "../" * depth if depth > 0 else ""
+    except ValueError:
+        return "" # Should only happen if output_path isn't in OUTPUT_DIR
 
-    if current_page + delta < total_pages - 1:
-        end = current_page + delta
-    else:
-        end = total_pages
+def render_template(env: Environment, template_name: str, output_rel_path: str, **context):
+    """Renders a Jinja template to a file."""
+    output_path = OUTPUT_DIR / output_rel_path
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    base_url = compute_base_url(output_path)
+    
+    # Global context available to all pages
+    full_context = {
+        "date": datetime.datetime.now().strftime("%Y-%m-%d"),
+        "base_url": base_url,
+        "home_link": f"{base_url}index.html",
+        **context
+    }
+    
+    template = env.get_template(template_name)
+    output_path.write_text(template.render(**full_context), encoding="utf-8")
 
-    range_pages.extend(range(start, end + 1))
-
-    if end < total_pages:
-        range_pages.append('...')
-        range_pages.append(total_pages)
-
-    return range_pages
+def get_pagination_range(current: int, total: int, delta: int = 3) -> List[Union[int, str]]:
+    """Calculates the range of page numbers for navigation."""
+    if total <= 1: return [1]
+    start, end = max(2, current - delta), min(total - 1, current + delta)
+    pages = [1, "..."] if start > 2 else [1]
+    pages.extend(range(start, end + 1))
+    pages.extend(["...", total]) if end < total - 1 else pages.append(total) if end < total else None
+    return pages
 
 # -----------------------------
 # Page Generators
 # -----------------------------
-def generate_index(env, pages, current_date, commit_sha="", num_rockets=0, num_variants=0):
-    output_path = OUTPUT_DIR / "index.html"
+def generate_index(env: Environment, pages_data: List[Dict], total_rockets: int, total_variants: int, commit_sha: str):
+    """Generates the main index.html file."""
     render_template(
-        env, "index.html", output_path,
+        env, 
+        "index.html", 
+        "index.html",
         title=INDEX_TITLE,
-        description=INDEX_DESCRIPTION,
+        description="SpaceDB home page listing catalog entries.",
         canonical="index.html",
-        pages=pages,
-        date=current_date,
-        base_url=compute_base_url(output_path),
-        home_link=compute_home_link(output_path),
-        num_rockets=num_rockets,
-        num_variants=num_variants,
+        pages=pages_data,
+        num_rockets=total_rockets,
+        num_variants=total_variants,
         commit_sha=commit_sha
     )
+    logger.info("Generated index.html")
 
-def generate_about_page(env, current_date, commit_sha=""):
-    output_path = OUTPUT_DIR / "about.html"
+def generate_about_page(env: Environment, commit_sha: str):
+    """Generates the about.html file."""
     render_template(
-        env, "about.html", output_path,
-        title="About SpaceDB",
-        description="Learn about SpaceDB, an open-source rocket and launch database",
+        env, 
+        "about.html", 
+        "about.html",
+        title=ABOUT_TITLE,
+        description="Learn about SpaceDB.",
         canonical="about.html",
-        date=current_date,
-        base_url=compute_base_url(output_path),
-        home_link=compute_home_link(output_path),
         commit_sha=commit_sha
     )
+    logger.info("Generated about.html")
 
-def generate_rockets_pages(env, rockets, current_date, commit_sha=""):
-    # Flatten rockets + variants into row list
+def generate_rockets_listing(env: Environment, rockets: List[Dict], items_per_page: int, commit_sha: str):
+    """Generates paginated listing pages for Rockets and their Variants."""
+    
+    # Flatten rockets + variants into one list for pagination
     rows = []
     for rocket in rockets:
         rows.append({"type": "rocket", "data": rocket})
         for variant in rocket.get("variants", []):
             rows.append({"type": "variant", "data": variant, "root": rocket})
 
-    total_pages = math.ceil(len(rows) / ITEMS_PER_PAGE)
-    template_name = "rockets.html"
-
+    total_pages = math.ceil(len(rows) / items_per_page)
+    
     for page_num in range(1, total_pages + 1):
-        start = (page_num - 1) * ITEMS_PER_PAGE
-        page_rows = rows[start:start + ITEMS_PER_PAGE]
-        pagination = get_pagination_range(page_num, total_pages, delta=3)
+        start = (page_num - 1) * items_per_page
+        page_rows = rows[start : start + items_per_page]
+        pagination = get_pagination_range(page_num, total_pages)
 
-        rockets_path = OUTPUT_DIR / (f"rockets.html" if page_num == 1 else f"rockets_page_{page_num}.html")
+        filename = f"{ROCKET_LIST_TITLE.lower()}.html" if page_num == 1 else f"{ROCKET_LIST_TITLE.lower()}_page_{page_num}.html"
 
         render_template(
-            env, template_name, rockets_path,
-            title=ROCKETS_TITLE_PATTERN.format(page_num=page_num),
-            description=ROCKETS_DESCRIPTION_PATTERN.format(page_num=page_num),
-            canonical=f"{rockets_path.name}",
+            env, 
+            "rockets.html", 
+            filename,
+            title=f"{ROCKET_LIST_TITLE} – Page {page_num}",
+            description=f"SpaceDB listing rockets – page {page_num}",
+            canonical=filename,
             rockets_page=page_rows,
             current_page=page_num,
             total_pages=total_pages,
             pagination=pagination,
-            date=current_date,
-            base_url=compute_base_url(rockets_path),
-            home_link=compute_home_link(rockets_path),
             commit_sha=commit_sha
         )
+    logger.info(f"Generated {total_pages} rocket listing page(s).")
 
-def generate_rocket_and_variant_pages(env, rockets, current_date, commit_sha=""):
-    rocket_dir = OUTPUT_DIR / "rocket"
-    rocket_dir.mkdir(parents=True, exist_ok=True)
-
+def generate_rocket_and_variant_details(env: Environment, rockets: List[Dict], commit_sha: str):
+    """Generates individual detail pages for each Rocket and Variant."""
+    
     for rocket in rockets:
-        rocket.setdefault("manufacturer", "Unknown")
-        rocket.setdefault("first_flight", "Unknown")
-        rocket.setdefault("rocket_height", 0)
-        rocket.setdefault("stages", 0)
-        rocket.setdefault("strap_ons", 0)
-        rocket.setdefault("liftoff_thrust", 0)
-        rocket.setdefault("payload_LEO", 0)
-        rocket.setdefault("payload_GTO", 0)
-        rocket.setdefault("missions", 0)
-        rocket.setdefault("launches", [])
-
-        for v in rocket.get("variants", []):
-            v.setdefault("name", "Unknown")
-            v.setdefault("slug", "unknown")
-            v.setdefault("first_flight", "Unknown")
-            v.setdefault("remarks", "")
-
-        # Rocket page
-        rocket_path = rocket_dir / f"{rocket['slug']}.html"
+        r_slug = rocket.get("slug", "unknown-rocket")
+        
+        # Rocket detail page
         render_template(
-            env, "rocket.html", rocket_path,
-            title=f"{rocket['name']} ({rocket['manufacturer']})",
-            description=f"{rocket['name']} – Manufacturer: {rocket['manufacturer']}, First Flight: {rocket['first_flight']}",
-            canonical=f"rocket/{rocket['slug']}.html",
+            env, 
+            "rocket.html", 
+            f"rocket/{r_slug}.html",
+            title=f"{rocket['name']} ({rocket.get('manufacturer', 'Unknown')})",
+            description=f"Details for the {rocket['name']} rocket.",
+            canonical=f"rocket/{r_slug}.html",
             rocket=rocket,
-            date=current_date,
-            base_url=compute_base_url(rocket_path),
-            home_link=compute_home_link(rocket_path),
-            show_title=True,
             commit_sha=commit_sha
         )
 
-        # Variant pages
-        variant_dir = rocket_dir / rocket['slug']
-        variant_dir.mkdir(parents=True, exist_ok=True)
+        # Variant detail pages
         for variant in rocket.get("variants", []):
-            variant_path = variant_dir / f"{variant['slug']}.html"
+            v_slug = variant.get("slug", "unknown-variant")
+            
             render_template(
-                env, "variant.html", variant_path,
-                title=f"{variant['name']} ({rocket['manufacturer']})",
-                description=f"{variant['name']} – First Flight: {variant['first_flight']}",
-                canonical=f"rocket/{rocket['slug']}/{variant['slug']}.html",
+                env, 
+                "variant.html", 
+                f"rocket/{r_slug}/{v_slug}.html",
+                title=f"{variant['name']} ({rocket.get('manufacturer', 'Unknown')})",
+                description=f"Details for the {variant['name']} variant.",
+                canonical=f"rocket/{r_slug}/{v_slug}.html",
                 variant=variant,
                 rocket=rocket,
-                date=current_date,
-                base_url=compute_base_url(variant_path),
-                home_link=compute_home_link(variant_path),
-                show_title=True,
                 commit_sha=commit_sha
             )
+    logger.info("Generated all individual rocket and variant detail pages.")
 
 # -----------------------------
-# Main Script
+# Main Execution Flow (The Simple Script)
 # -----------------------------
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -231,34 +201,47 @@ if __name__ == "__main__":
     commit_sha = args.commit_sha
 
     start_time = time.time()
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
-    rockets = load_json(ROCKETS_FILE)
-    validate_json(rockets, load_json(ROCKETS_SCHEMA_FILE))
-    pages = load_json(PAGES_FILE)
-    rockets.sort(key=lambda r: r["name"].lower())
-
-    remove_and_recreate_dir(OUTPUT_DIR)
-    copy_assets(ASSETS_DIR, OUTPUT_DIR / "assets")
-
-    env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)))
-
-    total_rockets = len(rockets)
-    total_variants = sum(len(r.get("variants", [])) for r in rockets)
-
-    generate_index(env, pages, current_date, commit_sha=commit_sha, num_rockets=total_rockets, num_variants=total_variants)
-    generate_about_page(env, current_date, commit_sha=commit_sha)
-
-    generate_rockets_pages(env, rockets, current_date, commit_sha=commit_sha)
-    generate_rocket_and_variant_pages(env, rockets, current_date, commit_sha=commit_sha)
-
-    total_pages_created = (
-        1 +
-        math.ceil((total_rockets + total_variants) / ITEMS_PER_PAGE) +  # rockets pages
-        len(rockets) +
-        sum(len(r.get("variants", [])) for r in rockets)
+    # 1. Setup Environment
+    cleanup_and_setup(OUTPUT_DIR, ASSETS_DIR)
+    
+    # Secure Jinja2 Setup
+    jinja_env = Environment(
+        loader=FileSystemLoader(str(TEMPLATE_DIR)),
+        autoescape=select_autoescape(['html', 'xml']),
+        trim_blocks=True, 
+        lstrip_blocks=True
     )
+
+    # 2. Load and Validate Data
+    pages_data = load_json(PAGES_FILE)
+    rockets_data = load_json(ROCKETS_FILE)
+    
+    try:
+        validate(instance=rockets_data, schema=load_json(ROCKETS_SCHEMA_FILE))
+        logger.info("Rocket data validation successful.")
+    except (ValidationError, FileNotFoundError) as e:
+        logger.error(f"FATAL: Rocket data validation failed. Aborting. Error: {e}")
+        exit(1)
+
+    # Sort data for consistent output
+    rockets_data.sort(key=lambda r: r.get("name", "").lower())
+    
+    total_rockets = len(rockets_data)
+    total_variants = sum(len(r.get("variants", [])) for r in rockets_data)
+    
+    # 3. Generate All Pages Sequentially
+    
+    # 3a. Static Pages
+    generate_index(jinja_env, pages_data, total_rockets, total_variants, commit_sha)
+    generate_about_page(jinja_env, commit_sha)
+    
+    # 3b. Catalog Listing Pages (Rockets)
+    generate_rockets_listing(jinja_env, rockets_data, ITEMS_PER_PAGE, commit_sha)
+    
+    # 3c. Detail Pages (Rockets and Variants)
+    generate_rocket_and_variant_details(jinja_env, rockets_data, commit_sha)
+
+    # 4. Final Output
     elapsed_time = time.time() - start_time
-    print(f"Site generated in '{OUTPUT_DIR}' folder.")
-    print(f"Total pages created: {total_pages_created}")
-    print(f"Time elapsed: {elapsed_time:.2f} seconds")
+    logger.info(f"Site generation finished in {elapsed_time:.2f} seconds.")
