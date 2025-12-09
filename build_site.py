@@ -118,6 +118,21 @@ def generate_index(env, pages, current_date, commit_sha="", num_rockets=0, num_v
         num_variants=num_variants,
         commit_sha=commit_sha
     )
+    
+def generate_about_page(env, current_date, commit_sha=""):
+    output_path = OUTPUT_DIR / "about.html"
+    render_template(
+        env, "about.html", output_path,
+        title="About SpaceDB",
+        description="Learn about SpaceDB, an open-source rocket and launch database",
+        canonical="about.html",
+        date=current_date,
+        base_url=compute_base_url(output_path),
+        home_link=compute_home_link(output_path),
+        commit_sha=commit_sha
+    )
+
+    
 
 def generate_rockets_pages(env, rockets, current_date, commit_sha=""):
     total_pages = math.ceil(len(rockets) / ITEMS_PER_PAGE)
@@ -227,6 +242,8 @@ if __name__ == "__main__":
     total_variants = sum(len(r.get("variants", [])) for r in rockets)
 
     generate_index(env, pages, current_date, commit_sha=commit_sha, num_rockets=total_rockets, num_variants=total_variants)
+    generate_about_page(env, current_date, commit_sha=commit_sha)
+
     generate_rockets_pages(env, rockets, current_date, commit_sha=commit_sha)
     generate_rocket_and_variant_pages(env, rockets, current_date, commit_sha=commit_sha)
 

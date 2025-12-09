@@ -8,5 +8,10 @@
     "title": "Launches",
     "summary": "List of launches",
     "url": "launches.html"
+  },
+    {
+    "title": "About",
+    "summary": "About SpaceDB",
+    "url": "about.html"
   }
 ]
