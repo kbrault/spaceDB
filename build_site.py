@@ -18,7 +18,7 @@ OUTPUT_DIR = Path("output_site")
 TEMPLATE_DIR = Path("templates")
 ASSETS_DIR = Path("assets")
 
-ITEMS_PER_PAGE = 25
+ITEMS_PER_PAGE = 30
 
 INDEX_TITLE = "Home"
 INDEX_DESCRIPTION = "SpaceDB home page listing rocket pages"
@@ -118,7 +118,7 @@ def generate_index(env, pages, current_date, commit_sha="", num_rockets=0, num_v
         num_variants=num_variants,
         commit_sha=commit_sha
     )
-    
+
 def generate_about_page(env, current_date, commit_sha=""):
     output_path = OUTPUT_DIR / "about.html"
     render_template(
@@ -132,15 +132,20 @@ def generate_about_page(env, current_date, commit_sha=""):
         commit_sha=commit_sha
     )
 
-    
-
 def generate_rockets_pages(env, rockets, current_date, commit_sha=""):
-    total_pages = math.ceil(len(rockets) / ITEMS_PER_PAGE)
+    # Flatten rockets + variants into row list
+    rows = []
+    for rocket in rockets:
+        rows.append({"type": "rocket", "data": rocket})
+        for variant in rocket.get("variants", []):
+            rows.append({"type": "variant", "data": variant, "root": rocket})
+
+    total_pages = math.ceil(len(rows) / ITEMS_PER_PAGE)
     template_name = "rockets.html"
 
     for page_num in range(1, total_pages + 1):
         start = (page_num - 1) * ITEMS_PER_PAGE
-        rockets_page = rockets[start:start + ITEMS_PER_PAGE]
+        page_rows = rows[start:start + ITEMS_PER_PAGE]
         pagination = get_pagination_range(page_num, total_pages, delta=3)
 
         rockets_path = OUTPUT_DIR / (f"rockets.html" if page_num == 1 else f"rockets_page_{page_num}.html")
@@ -150,7 +155,7 @@ def generate_rockets_pages(env, rockets, current_date, commit_sha=""):
             title=ROCKETS_TITLE_PATTERN.format(page_num=page_num),
             description=ROCKETS_DESCRIPTION_PATTERN.format(page_num=page_num),
             canonical=f"{rockets_path.name}",
-            rockets=rockets_page,
+            rockets_page=page_rows,
             current_page=page_num,
             total_pages=total_pages,
             pagination=pagination,
@@ -249,7 +254,7 @@ if __name__ == "__main__":
 
     total_pages_created = (
         1 +
-        math.ceil(len(rockets) / ITEMS_PER_PAGE) +
+        math.ceil((total_rockets + total_variants) / ITEMS_PER_PAGE) +  # rockets pages
         len(rockets) +
         sum(len(r.get("variants", [])) for r in rockets)
     )
