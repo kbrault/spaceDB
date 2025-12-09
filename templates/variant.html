@@ -52,7 +52,7 @@
                         ('Liftoff Thrust', variant.liftoff_thrust ~ ' kN' if variant.liftoff_thrust else None),
                         ('Payload to LEO', variant.payload_LEO ~ ' kg' if variant.payload_LEO else None),
                         ('Payload to GTO', variant.payload_GTO ~ ' kg' if variant.payload_GTO else None),
-                        ('Price', '$' ~ variant.price if variant.price else None)
+                        ('Cost per launch', ('$' ~ "{:,.0f}".format(variant.price)) if variant.price else None)
                         ] %}
                         {% for label, value in fields %}
                         {% if value and value != "Unknown" %}
@@ -80,7 +80,7 @@
 
 <div class="card mb-3">
     <div class="card-header py-2 fs-4 fw-bold">
-        {{ rocket.name }} launches for {{ variant.name }} (total: {{ variant.missions | default(0) }})
+        {{ variant.name }} launches (total: {{ variant.missions | default(0) }})
     </div>
     <div class="card-body p-2">
         <div class="list-group list-group-flush mb-0">
